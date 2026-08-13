@@ -64,7 +64,7 @@ export default function TrialUpload() {
       recordTrialAttempt();
       navigate("/trial/results", { state: result });
     } catch (err) {
-      setUploadError(err.message || "Gagal memproses file.");
+      setUploadError(err.message || "File gagal diproses. Pastikan kolomnya sesuai template, lalu coba lagi.");
     } finally {
       setUploading(false);
     }
@@ -85,7 +85,7 @@ export default function TrialUpload() {
       if (err instanceof ApiError && err.status === 400) {
         setManualError(err.message || "Data tidak valid. Periksa kembali isian Anda.");
       } else {
-        setManualError(err.message || "Gagal memproses data pelanggan.");
+        setManualError(err.message || "Gagal memproses data pelanggan. Periksa koneksi internet Anda, lalu coba lagi.");
       }
     } finally {
       setSubmitting(false);

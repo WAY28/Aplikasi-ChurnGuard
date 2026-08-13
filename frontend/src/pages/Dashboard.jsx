@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Filter, PackageOpen } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import MetricCard from "../components/MetricCard";
 import CustomerRow from "../components/CustomerRow";
 import EmptyState from "../components/EmptyState";
-import LoadingSpinner from "../components/LoadingSpinner";
+import DashboardSkeleton from "../components/DashboardSkeleton";
 import { listCustomers } from "../api/endpoints";
 import { loadCache, saveCache } from "../utils/offlineCache";
 
@@ -34,7 +34,7 @@ export default function Dashboard() {
         setCustomers(cached.data);
         setFromCache(true);
       } else {
-        setError(err.message || "Gagal memuat data pelanggan");
+        setError(err.message || "Gagal memuat data pelanggan. Muat ulang halaman untuk mencoba lagi.");
       }
     } finally {
       setLoading(false);
@@ -47,6 +47,13 @@ export default function Dashboard() {
 
   const totalCustomers = customers.length;
   const highRiskCount = customers.filter((c) => c.churn_prediction === 1).length;
+
+  // Risiko tertinggi tampil paling atas by default, supaya pemilik UMKM
+  // langsung lihat pelanggan yang paling perlu ditindaklanjuti.
+  const sortedCustomers = useMemo(
+    () => [...customers].sort((a, b) => (b.churn_probability ?? 0) - (a.churn_probability ?? 0)),
+    [customers],
+  );
 
   return (
     <div className="stack">
@@ -75,30 +82,34 @@ export default function Dashboard() {
 
       {error && <div className="error-banner">{error}</div>}
 
-      <div className="dashboard-metrics">
-        <MetricCard label="Total Pelanggan" value={totalCustomers} tone="primary" />
-        <MetricCard label="Risiko Tinggi" value={highRiskCount} tone="danger" />
-        <MetricCard label="Akurasi Model" value={MODEL_ACCURACY_LABEL} tone="info" />
-      </div>
-
       {loading ? (
-        <LoadingSpinner label="Memuat data pelanggan..." />
-      ) : customers.length === 0 ? (
-        <EmptyState
-          title="Belum ada pelanggan"
-          description="Unggah data pelanggan untuk mulai melihat analisis risiko churn."
-          action={
-            <Link to="/upload" className="btn btn-primary">
-              Upload Data
-            </Link>
-          }
-        />
+        <DashboardSkeleton />
       ) : (
-        <div className="stack">
-          {customers.map((c) => (
-            <CustomerRow key={c.id} customer={c} />
-          ))}
-        </div>
+        <>
+          <div className="dashboard-metrics">
+            <MetricCard label="Total Pelanggan" value={totalCustomers} tone="primary" index={0} />
+            <MetricCard label="Risiko Tinggi" value={highRiskCount} tone="danger" index={1} />
+            <MetricCard label="Akurasi Model" value={MODEL_ACCURACY_LABEL} tone="info" index={2} />
+          </div>
+
+          {sortedCustomers.length === 0 ? (
+            <EmptyState
+              title="Belum ada pelanggan"
+              description="Unggah data pelanggan untuk mulai melihat analisis risiko churn."
+              action={
+                <Link to="/upload" className="btn btn-primary">
+                  Upload Data
+                </Link>
+              }
+            />
+          ) : (
+            <div className="stack">
+              {sortedCustomers.map((c, i) => (
+                <CustomerRow key={c.id} customer={c} index={i} />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

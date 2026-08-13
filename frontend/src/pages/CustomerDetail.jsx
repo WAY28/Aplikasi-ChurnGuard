@@ -3,7 +3,7 @@ import { ArrowLeft, Mail, MessageCircle, PackageOpen } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import Badge from "../components/Badge";
 import FeatureImportanceBars from "../components/FeatureImportanceBars";
-import LoadingSpinner from "../components/LoadingSpinner";
+import CustomerDetailSkeleton from "../components/CustomerDetailSkeleton";
 import EmptyState from "../components/EmptyState";
 import { useAuth } from "../context/AuthContext";
 import { getCustomer, updateContactStatus } from "../api/endpoints";
@@ -43,7 +43,7 @@ export default function CustomerDetail() {
         setCustomer(cached.data);
         setFromCache(true);
       } else {
-        setError(err.message || "Gagal memuat detail pelanggan");
+        setError(err.message || "Gagal memuat detail pelanggan. Muat ulang halaman untuk mencoba lagi.");
       }
     } finally {
       setLoading(false);
@@ -73,13 +73,13 @@ export default function CustomerDetail() {
         window.location.href = link;
       }
     } catch (err) {
-      setError(err.message || "Gagal memperbarui status kontak");
+      setError(err.message || "Gagal memperbarui status kontak. Coba lagi dalam beberapa saat.");
     } finally {
       setContacting(null);
     }
   }
 
-  if (loading) return <LoadingSpinner label="Memuat detail pelanggan..." />;
+  if (loading) return <CustomerDetailSkeleton />;
 
   if (notFound) {
     return (
@@ -179,7 +179,9 @@ export default function CustomerDetail() {
         {!customer.phone && !customer.email && (
           <p className="field-error">Pelanggan ini tidak punya nomor telepon maupun email.</p>
         )}
-        {fromCache && <p className="field-error">Tidak bisa menghubungi pelanggan saat offline.</p>}
+        {fromCache && (
+          <p className="field-error">Tidak bisa menghubungi pelanggan saat offline. Sambungkan internet, lalu coba lagi.</p>
+        )}
       </div>
 
       <div className="card">

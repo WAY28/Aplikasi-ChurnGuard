@@ -45,6 +45,7 @@
   --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
 
   --shadow-card: 0 1px 2px rgba(28, 37, 48, 0.04), 0 8px 24px -12px rgba(28, 37, 48, 0.12);
+  --shadow-card-hover: 0 2px 6px rgba(28, 37, 48, 0.06), 0 16px 36px -14px rgba(28, 37, 48, 0.22);
 
   color-scheme: light;
 }
@@ -103,6 +104,12 @@ a {
 .auth-footer a,
 .info-notice a {
   text-decoration: underline;
+  /* Perbesar area tap link inline (target sentuh ~44px) tanpa mengganggu alur
+     teks: padding menambah kotak yang bisa disentuh, margin negatif menetralkan
+     efeknya ke layout (padding elemen inline tidak memengaruhi line-height). */
+  padding: 14px 2px;
+  margin: -14px -2px;
+  touch-action: manipulation;
 }
 
 button,
@@ -134,11 +141,13 @@ textarea {
   border: none;
   border-radius: var(--radius-md);
   padding: 12px 20px;
+  min-height: 44px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
+  transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
   text-decoration: none;
+  touch-action: manipulation;
 }
 
 .btn svg {
@@ -154,6 +163,19 @@ textarea {
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-primary,
+.btn-success,
+.btn-info {
+  box-shadow: 0 1px 2px rgba(28, 37, 48, 0.08);
+}
+
+.btn-primary:hover:not(:disabled),
+.btn-success:hover:not(:disabled),
+.btn-info:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -6px rgba(28, 37, 48, 0.35);
 }
 
 .btn-primary {
@@ -220,6 +242,7 @@ textarea {
 .field input,
 .field select {
   width: 100%;
+  min-height: 44px;
   padding: 10px 12px;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-sm);
@@ -314,6 +337,18 @@ textarea {
   text-align: center;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .stack {
   display: flex;
   flex-direction: column;
@@ -351,14 +386,18 @@ textarea {
 }
 
 .upload-tab {
+  display: inline-flex;
+  align-items: center;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
   padding: var(--space-2) var(--space-3);
+  min-height: 44px;
   font-weight: 600;
   color: var(--color-text-secondary);
   cursor: pointer;
   margin-bottom: -1.5px;
+  touch-action: manipulation;
 }
 
 .upload-tab:hover:not(.active) {
@@ -373,6 +412,7 @@ textarea {
 .link-button {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   gap: 6px;
   background: none;
   border: none;
@@ -380,8 +420,9 @@ textarea {
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
-  padding: 4px 0;
+  padding: 10px 0;
   text-align: left;
+  touch-action: manipulation;
 }
 
 .link-button:hover {
@@ -391,14 +432,18 @@ textarea {
 .checkbox-field {
   display: flex;
   align-items: center;
+  min-height: 44px;
   gap: var(--space-2);
   font-size: 0.9rem;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .checkbox-field input {
   width: 18px;
   height: 18px;
+  flex-shrink: 0;
+  cursor: pointer;
 }
 
 .dashboard-metrics {
@@ -437,5 +482,30 @@ textarea {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Kemunculan berurutan (staggered) untuk kartu/baris saat data pertama kali
+   dimuat. --stagger-index diset lewat inline style per item (lihat komponen
+   pemakainya), dibatasi di JS supaya daftar panjang tidak jadi lambat. */
+@keyframes fade-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-item {
+  animation: fade-slide-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--stagger-index, 0) * 60ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stagger-item {
+    animation: none;
   }
 }

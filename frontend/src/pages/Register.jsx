@@ -39,9 +39,9 @@ export default function Register() {
       navigate("/upload");
     } catch (err) {
       if (err instanceof ApiError && err.status === 400) {
-        setError(err.message || "Email sudah terdaftar.");
+        setError(err.message || "Email sudah terdaftar. Gunakan email lain atau masuk dengan akun yang ada.");
       } else {
-        setError(err.message || "Gagal mendaftar, coba lagi.");
+        setError(err.message || "Gagal mendaftar. Periksa koneksi internet Anda, lalu coba lagi.");
       }
     } finally {
       setLoading(false);

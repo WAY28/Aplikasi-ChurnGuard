@@ -26,14 +26,18 @@ export default function TrialResults() {
       </div>
 
       <div className="dashboard-metrics">
-        <MetricCard label="Total Pelanggan" value={result.total_customers} tone="primary" />
-        <MetricCard label="Risiko Tinggi" value={result.high_risk_count} tone="danger" />
-        <MetricCard label="Akurasi Model" value={MODEL_ACCURACY_LABEL} tone="info" />
+        <MetricCard label="Total Pelanggan" value={result.total_customers} tone="primary" index={0} />
+        <MetricCard label="Risiko Tinggi" value={result.high_risk_count} tone="danger" index={1} />
+        <MetricCard label="Akurasi Model" value={MODEL_ACCURACY_LABEL} tone="info" index={2} />
       </div>
 
       <div className="stack">
-        {result.results.map((row) => (
-          <div className="trial-result-row" key={row.row}>
+        {result.results.map((row, i) => (
+          <div
+            className="trial-result-row stagger-item"
+            style={{ "--stagger-index": Math.min(i, 8) }}
+            key={row.row}
+          >
             <span className="trial-result-row-label">Baris {row.row}</span>
             <div className="row">
               <Badge tone={riskTone(row.churn_prediction)}>{riskLabel(row.churn_prediction)}</Badge>

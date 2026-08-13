@@ -25,6 +25,20 @@
 
 .feature-bar-fill {
   height: 100%;
+  width: 100%;
   background: var(--color-primary);
   border-radius: var(--radius-full);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.feature-bar-fill.is-filled {
+  transform: scaleX(var(--fill-ratio, 1));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-bar-fill {
+    transition: none;
+  }
 }

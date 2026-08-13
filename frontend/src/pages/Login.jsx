@@ -28,9 +28,9 @@ export default function Login() {
       navigate("/upload");
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
-        setError("Email atau password salah.");
+        setError("Email atau password salah. Periksa kembali lalu coba lagi.");
       } else {
-        setError(err.message || "Gagal masuk, coba lagi.");
+        setError(err.message || "Gagal masuk. Periksa koneksi internet Anda, lalu coba lagi.");
       }
     } finally {
       setLoading(false);

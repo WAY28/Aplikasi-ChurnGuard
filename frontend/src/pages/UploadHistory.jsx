@@ -3,7 +3,7 @@ import { History, PackageOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import Badge from "../components/Badge";
 import EmptyState from "../components/EmptyState";
-import LoadingSpinner from "../components/LoadingSpinner";
+import UploadHistorySkeleton from "../components/UploadHistorySkeleton";
 import { listUploadSessions } from "../api/endpoints";
 import { loadCache, saveCache } from "../utils/offlineCache";
 import { formatDate } from "../utils/format";
@@ -32,7 +32,7 @@ export default function UploadHistory() {
           setSessions(cached.data);
           setFromCache(true);
         } else {
-          setError(err.message || "Gagal memuat riwayat upload");
+          setError(err.message || "Gagal memuat riwayat upload. Muat ulang halaman untuk mencoba lagi.");
         }
       } finally {
         setLoading(false);
@@ -57,12 +57,12 @@ export default function UploadHistory() {
       {error && <div className="error-banner">{error}</div>}
 
       {loading ? (
-        <LoadingSpinner label="Memuat riwayat..." />
+        <UploadHistorySkeleton />
       ) : sessions.length === 0 ? (
         <EmptyState
           icon={History}
           title="Belum ada riwayat upload"
-          description="Sesi upload yang pernah Anda lakukan akan muncul di sini."
+          description="Upload data pelanggan pertama Anda untuk mulai melihat riwayatnya di sini."
           action={
             <Link to="/upload" className="btn btn-primary">
               Upload Data
@@ -71,8 +71,13 @@ export default function UploadHistory() {
         />
       ) : (
         <div className="stack">
-          {sessions.map((s) => (
-            <Link key={s.id} to={`/dashboard?upload_session_id=${s.id}`} className="history-row">
+          {sessions.map((s, i) => (
+            <Link
+              key={s.id}
+              to={`/dashboard?upload_session_id=${s.id}`}
+              className="history-row stagger-item"
+              style={{ "--stagger-index": Math.min(i, 8) }}
+            >
               <div className="history-row-main">
                 <strong>{s.filename}</strong>
                 <span className="muted">{formatDate(s.uploaded_at)}</span>

@@ -3,9 +3,13 @@ import Badge from "./Badge";
 import { contactStatusLabel, contactStatusTone, formatPercent, initials, riskLabel, riskTone } from "../utils/format";
 import "./CustomerRow.css";
 
-export default function CustomerRow({ customer }) {
+export default function CustomerRow({ customer, index = 0 }) {
   return (
-    <Link to={`/customers/${customer.id}`} className="customer-row">
+    <Link
+      to={`/customers/${customer.id}`}
+      className="customer-row stagger-item"
+      style={{ "--stagger-index": Math.min(index, 8) }}
+    >
       <div className="customer-row-avatar">{initials(customer.name)}</div>
       <div className="customer-row-main">
         <div className="customer-row-name">{customer.name || "Tanpa nama"}</div>

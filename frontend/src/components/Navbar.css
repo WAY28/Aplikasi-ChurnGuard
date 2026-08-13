@@ -35,17 +35,23 @@
 
 .navbar-links {
   display: flex;
-  gap: var(--space-1);
+  align-items: center;
+  gap: var(--space-2);
   flex: 1;
 }
 
 .navbar-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   color: rgba(255, 255, 255, 0.78);
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 600;
   padding: 8px 14px;
   border-radius: var(--radius-full);
+  touch-action: manipulation;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 
 .navbar-link.active {
@@ -80,6 +86,7 @@
 .navbar-logout {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   gap: 6px;
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
@@ -89,6 +96,8 @@
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.15s ease;
 }
 
 .navbar-logout:hover {

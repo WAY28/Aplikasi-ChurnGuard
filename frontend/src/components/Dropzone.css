@@ -8,13 +8,15 @@
   gap: 4px;
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  touch-action: manipulation;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
 }
 
 .dropzone:hover,
 .dropzone-active {
   border-color: var(--color-info);
   background: var(--color-info-bg);
+  transform: scale(1.01);
 }
 
 .dropzone-icon {

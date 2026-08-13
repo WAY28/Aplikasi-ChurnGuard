@@ -9,13 +9,15 @@
   text-decoration: none;
   color: inherit;
   box-shadow: var(--shadow-card);
-  transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  touch-action: manipulation;
 }
 
 .customer-row:hover {
   border-color: var(--color-info);
   background: var(--color-info-bg);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .customer-row-avatar {

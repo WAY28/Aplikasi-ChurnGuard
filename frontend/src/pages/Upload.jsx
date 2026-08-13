@@ -38,7 +38,7 @@ export default function Upload() {
       const result = await uploadCustomers(selectedFile);
       navigate(`/dashboard?upload_session_id=${result.upload_session_id}`);
     } catch (err) {
-      setUploadError(err.message || "Gagal memproses file.");
+      setUploadError(err.message || "File gagal diproses. Pastikan kolomnya sesuai template, lalu coba lagi.");
     } finally {
       setUploading(false);
     }
@@ -61,7 +61,7 @@ export default function Upload() {
       if (err instanceof ApiError && err.status === 400) {
         setManualError(err.message || "Data tidak valid. Periksa kembali isian Anda.");
       } else {
-        setManualError(err.message || "Gagal memproses data pelanggan.");
+        setManualError(err.message || "Gagal memproses data pelanggan. Periksa koneksi internet Anda, lalu coba lagi.");
       }
     } finally {
       setSubmitting(false);
