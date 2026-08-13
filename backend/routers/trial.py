@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, UploadFile, status
+from fastapi import APIRouter, UploadFile
 
 import schemas
-from ml.predictor import ModelNotLoadedError, churn_model
+from errors import handle_prediction_errors
+from ml.predictor import churn_model
 from upload_utils import parse_upload_file
 
 router = APIRouter(prefix="/api/trial", tags=["trial"])
@@ -15,12 +16,8 @@ router = APIRouter(prefix="/api/trial", tags=["trial"])
 
 @router.post("/predict", response_model=schemas.TrialPredictResponse)
 def trial_predict(payload: schemas.CustomerFeatures):
-    try:
+    with handle_prediction_errors():
         prediction, probability = churn_model.predict_one(payload.model_dump())
-    except ModelNotLoadedError:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Model belum siap")
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
     return schemas.TrialPredictResponse(
         churn_prediction=prediction,
@@ -33,12 +30,8 @@ def trial_predict(payload: schemas.CustomerFeatures):
 async def trial_upload(file: UploadFile):
     records = await parse_upload_file(file)
 
-    try:
+    with handle_prediction_errors():
         predictions = churn_model.predict_batch(records)
-    except ModelNotLoadedError:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Model belum siap")
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
     results = []
     high_risk_count = 0

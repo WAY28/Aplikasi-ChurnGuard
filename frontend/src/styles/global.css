@@ -17,6 +17,7 @@
   /* Signature/highlight amber, sengaja dipakai terbatas */
   --color-highlight: #f5a623;
   --color-highlight-light: #fdf1dc;
+  --color-highlight-text: #8a5a00;
 
   --color-neutral: #5b6470;
   --color-neutral-bg: #eaeeee;
@@ -94,6 +95,14 @@ p {
 
 a {
   color: var(--color-info);
+  text-decoration: none;
+}
+
+/* Link teks biasa di dalam kalimat (bukan tombol) tetap digarisbawahi supaya
+   tidak cuma mengandalkan warna sebagai penanda -- penting untuk aksesibilitas. */
+.auth-footer a,
+.info-notice a {
+  text-decoration: underline;
 }
 
 button,
@@ -262,7 +271,7 @@ textarea {
 /* Dipakai terbatas: mode coba tanpa akun, bukan untuk notice biasa */
 .info-notice-highlight {
   background: var(--color-highlight-light);
-  color: #8a5a00;
+  color: var(--color-highlight-text);
 }
 
 .error-banner {
@@ -350,6 +359,10 @@ textarea {
   color: var(--color-text-secondary);
   cursor: pointer;
   margin-bottom: -1.5px;
+}
+
+.upload-tab:hover:not(.active) {
+  color: var(--color-text);
 }
 
 .upload-tab.active {

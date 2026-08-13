@@ -23,6 +23,7 @@ Thumbs.db
 
 # Ad-hoc QA output, not part of the app
 screenshots/
+audit-screenshots/
 
 # Original attachment; the copy actually used by the app lives in backend/ml/
 /model_churn.pkl

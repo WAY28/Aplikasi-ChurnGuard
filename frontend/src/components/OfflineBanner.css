@@ -4,7 +4,7 @@
   justify-content: center;
   gap: var(--space-2);
   background: var(--color-highlight-light);
-  color: #8a5a00;
+  color: var(--color-highlight-text);
   text-align: center;
   font-size: 0.85rem;
   font-weight: 600;

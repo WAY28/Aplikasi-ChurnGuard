@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { getToken, onUnauthorized, setToken as persistToken } from "../api/client";
 import * as endpoints from "../api/endpoints";
 
@@ -47,17 +47,19 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
-  async function login(email, password) {
+  const login = useCallback(async (email, password) => {
     const result = await endpoints.login({ email, password });
     persistToken(result.access_token);
     setTokenState(result.access_token);
-    const nextUser = { email, business_name: user?.email === email ? user.business_name : null };
-    localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
-    setUser(nextUser);
+    setUser((prevUser) => {
+      const nextUser = { email, business_name: prevUser?.email === email ? prevUser.business_name : null };
+      localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
+      return nextUser;
+    });
     return result;
-  }
+  }, []);
 
-  async function register(businessName, email, password) {
+  const register = useCallback(async (businessName, email, password) => {
     const result = await endpoints.registerAccount({
       business_name: businessName,
       email,
@@ -71,18 +73,18 @@ export function AuthProvider({ children }) {
     localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
     setUser(nextUser);
     return result;
-  }
+  }, []);
 
-  function logout() {
+  const logout = useCallback(() => {
     persistToken(null);
     localStorage.removeItem(USER_KEY);
     setTokenState(null);
     setUser(null);
-  }
+  }, []);
 
   const value = useMemo(
     () => ({ token, user, isAuthenticated: !!token, login, register, logout }),
-    [token, user],
+    [token, user, login, register, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

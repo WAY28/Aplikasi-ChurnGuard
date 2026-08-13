@@ -3,6 +3,7 @@ import { Download, Sparkles } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Badge from "../components/Badge";
 import Dropzone from "../components/Dropzone";
+import UploadModeTabs from "../components/UploadModeTabs";
 import CustomerFeatureForm from "../components/CustomerFeatureForm";
 import EmptyState from "../components/EmptyState";
 import FeatureImportanceBars from "../components/FeatureImportanceBars";
@@ -113,22 +114,7 @@ export default function TrialUpload() {
         </span>
       </div>
 
-      <div className="upload-tabs">
-        <button
-          type="button"
-          className={mode === "file" ? "upload-tab active" : "upload-tab"}
-          onClick={() => setMode("file")}
-        >
-          Upload File
-        </button>
-        <button
-          type="button"
-          className={mode === "manual" ? "upload-tab active" : "upload-tab"}
-          onClick={() => setMode("manual")}
-        >
-          Input Manual
-        </button>
-      </div>
+      <UploadModeTabs mode={mode} onChange={setMode} />
 
       {mode === "file" && (
         <div className="card stack">

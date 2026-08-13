@@ -8,10 +8,22 @@ import schemas
 from auth import get_current_user
 from constants import CUSTOMER_FEATURE_FIELDS, feature_dict
 from database import get_db
-from ml.predictor import ModelNotLoadedError, churn_model
+from errors import handle_prediction_errors
+from ml.predictor import churn_model
 from upload_utils import parse_upload_file
 
 router = APIRouter(prefix="/api/customers", tags=["customers"])
+
+
+def get_customer_or_404(db: Session, customer_id: int, user_id: int) -> models.Customer:
+    # NFR-4: filter user_id WAJIB, dan 404 (bukan 403) baik saat id tidak ada
+    # maupun saat id ada tapi bukan milik akun ini -- pesan error sengaja disamakan.
+    customer = (
+        db.query(models.Customer).filter(models.Customer.id == customer_id, models.Customer.user_id == user_id).first()
+    )
+    if customer is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pelanggan tidak ditemukan")
+    return customer
 
 
 @router.post("", response_model=schemas.CustomerCreateResponse, status_code=status.HTTP_201_CREATED)
@@ -20,12 +32,8 @@ def create_customer(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    try:
+    with handle_prediction_errors():
         prediction, probability = churn_model.predict_one(payload.model_dump())
-    except ModelNotLoadedError:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Model belum siap")
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
     customer = models.Customer(
         user_id=current_user.id,
@@ -54,12 +62,8 @@ async def upload_customers(
     filename = file.filename or "upload"
     records = await parse_upload_file(file)
 
-    try:
+    with handle_prediction_errors():
         predictions = churn_model.predict_batch(records)
-    except ModelNotLoadedError:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Model belum siap")
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
     upload_session = models.UploadSession(
         user_id=current_user.id,
@@ -173,15 +177,7 @@ def get_customer(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    # NFR-4: filter user_id WAJIB, dan 404 (bukan 403) baik saat id tidak ada
-    # maupun saat id ada tapi bukan milik akun ini -- pesan error sengaja disamakan.
-    customer = (
-        db.query(models.Customer)
-        .filter(models.Customer.id == customer_id, models.Customer.user_id == current_user.id)
-        .first()
-    )
-    if customer is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pelanggan tidak ditemukan")
+    customer = get_customer_or_404(db, customer_id, current_user.id)
 
     top_factors = churn_model.top_factors()
     detail = schemas.CustomerOut.model_validate(customer).model_dump()
@@ -195,14 +191,7 @@ def update_contact_status(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    # NFR-4: filter user_id WAJIB, 404 sama seperti GET /{id} (bukan ditemukan/bukan milik akun ini)
-    customer = (
-        db.query(models.Customer)
-        .filter(models.Customer.id == customer_id, models.Customer.user_id == current_user.id)
-        .first()
-    )
-    if customer is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pelanggan tidak ditemukan")
+    customer = get_customer_or_404(db, customer_id, current_user.id)
 
     customer.contact_status = payload.contact_status
     customer.contacted_at = datetime.now(timezone.utc)

@@ -3,6 +3,7 @@ import { Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Badge from "../components/Badge";
 import Dropzone from "../components/Dropzone";
+import UploadModeTabs from "../components/UploadModeTabs";
 import CustomerFeatureForm from "../components/CustomerFeatureForm";
 import { createCustomer, uploadCustomers } from "../api/endpoints";
 import { ApiError } from "../api/client";
@@ -80,22 +81,7 @@ export default function Upload() {
         <p>Unggah file CSV atau Excel berisi banyak pelanggan sekaligus. Atau, input satu pelanggan secara manual.</p>
       </div>
 
-      <div className="upload-tabs">
-        <button
-          type="button"
-          className={mode === "file" ? "upload-tab active" : "upload-tab"}
-          onClick={() => setMode("file")}
-        >
-          Upload File
-        </button>
-        <button
-          type="button"
-          className={mode === "manual" ? "upload-tab active" : "upload-tab"}
-          onClick={() => setMode("manual")}
-        >
-          Input Manual
-        </button>
-      </div>
+      <UploadModeTabs mode={mode} onChange={setMode} />
 
       {mode === "file" && (
         <div className="card stack">

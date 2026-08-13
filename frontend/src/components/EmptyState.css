@@ -21,7 +21,7 @@
 
 .empty-state-icon-highlight {
   background: var(--color-highlight-light);
-  color: #8a5a00;
+  color: var(--color-highlight-text);
 }
 
 .empty-state h3 {
