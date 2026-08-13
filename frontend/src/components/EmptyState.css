@@ -1,0 +1,29 @@
+.empty-state {
+  text-align: center;
+  padding: var(--space-7) var(--space-4);
+  color: var(--color-text-secondary);
+}
+
+.empty-state-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: var(--space-3);
+  border-radius: var(--radius-full);
+}
+
+.empty-state-icon-neutral {
+  background: var(--color-neutral-bg);
+  color: var(--color-neutral);
+}
+
+.empty-state-icon-highlight {
+  background: var(--color-highlight-light);
+  color: #8a5a00;
+}
+
+.empty-state h3 {
+  color: var(--color-text);
+}

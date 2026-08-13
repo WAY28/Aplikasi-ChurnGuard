@@ -1,0 +1,30 @@
+.dropzone {
+  border: 1.5px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.dropzone:hover,
+.dropzone-active {
+  border-color: var(--color-info);
+  background: var(--color-info-bg);
+}
+
+.dropzone-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-info-bg);
+  color: var(--color-info);
+}

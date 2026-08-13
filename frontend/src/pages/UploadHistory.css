@@ -1,0 +1,33 @@
+.history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: inherit;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+}
+
+.history-row:hover {
+  border-color: var(--color-info);
+  background: var(--color-info-bg);
+  transform: translateY(-1px);
+}
+
+.history-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.history-row-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}

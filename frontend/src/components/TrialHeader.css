@@ -1,0 +1,16 @@
+.trial-header-badge {
+  display: none;
+  align-items: center;
+  background: var(--color-highlight);
+  color: var(--color-primary-dark);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+}
+
+@media (min-width: 480px) {
+  .trial-header-badge {
+    display: inline-flex;
+  }
+}

@@ -1,0 +1,25 @@
+.trial-result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.trial-result-row-label {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.trial-result-row-score {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.trial-cta {
+  background: var(--color-info-bg);
+  border-color: var(--color-info-bg);
+}

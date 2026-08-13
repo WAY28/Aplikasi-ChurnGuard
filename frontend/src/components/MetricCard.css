@@ -1,0 +1,47 @@
+.metric-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  border-left: 4px solid var(--color-neutral);
+  min-width: 0;
+  box-shadow: var(--shadow-card);
+}
+
+.metric-card-value {
+  font-family: var(--font-display);
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.1;
+}
+
+.metric-card-label {
+  margin-top: var(--space-1);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.metric-card-primary {
+  border-left-color: var(--color-primary);
+}
+
+.metric-card-danger {
+  border-left-color: var(--color-danger);
+}
+
+.metric-card-danger .metric-card-value {
+  color: var(--color-danger);
+}
+
+.metric-card-success {
+  border-left-color: var(--color-success);
+}
+
+.metric-card-success .metric-card-value {
+  color: var(--color-success);
+}
+
+.metric-card-info {
+  border-left-color: var(--color-info);
+}
