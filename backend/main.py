@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 import models  # noqa: F401 -- registrasi model ke Base.metadata
+from config import CORS_ORIGINS
 from database import Base, engine
 from ml.predictor import churn_model
 from routers import auth as auth_router
@@ -23,7 +24,9 @@ app = FastAPI(title="ChurnGuard API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # dev only -- batasi ke origin frontend saat produksi
+    # Daftar origin eksplisit (lihat config.CORS_ORIGINS), bukan wildcard "*".
+    # Set env CORS_ORIGINS (dipisah koma) untuk menambah origin produksi.
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
