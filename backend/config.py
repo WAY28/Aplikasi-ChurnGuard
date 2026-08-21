@@ -61,6 +61,16 @@ CORS_ORIGINS = [
     if origin.strip()
 ]
 
+# Proteksi /docs, /redoc, /openapi.json di production. Tiga mode:
+#   1. DOCS_ENABLED=false                                  -> nonaktif total (paling aman)
+#   2. DOCS_ENABLED=true + DOCS_BASIC_AUTH_USER/PASSWORD    -> tetap ada, digembok HTTP Basic Auth
+#   3. DOCS_ENABLED=true, dua-duanya kosong (default)       -> terbuka publik (perilaku lama, cocok utk dev lokal)
+# Endpoint API-nya sendiri TETAP jalan di ketiga mode -- ini cuma soal
+# dokumentasi/introspeksi skema yang bisa dilihat orang.
+DOCS_ENABLED = os.getenv("DOCS_ENABLED", "true").lower() == "true"
+DOCS_BASIC_AUTH_USER = os.getenv("DOCS_BASIC_AUTH_USER")
+DOCS_BASIC_AUTH_PASSWORD = os.getenv("DOCS_BASIC_AUTH_PASSWORD")
+
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL belum diset. Salin .env.example ke .env dan isi nilainya.")
 if not JWT_SECRET_KEY:

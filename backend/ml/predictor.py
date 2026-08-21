@@ -16,11 +16,14 @@ divalidasi: prediksi dengan mapping ini mencapai akurasi 98.6% saat
 dicocokkan ke kolom Churn asli di seluruh 5630 baris dataset training.
 """
 
+import logging
 from pathlib import Path
 from typing import Any
 
 import joblib
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 MODEL_PATH = Path(__file__).parent / "model_churn.pkl"
 
@@ -79,7 +82,12 @@ class ChurnModel:
         self._model = None
 
     def load(self) -> None:
-        self._model = joblib.load(MODEL_PATH)
+        try:
+            self._model = joblib.load(MODEL_PATH)
+        except Exception:
+            logger.exception("Gagal memuat model churn dari %s", MODEL_PATH)
+            raise
+        logger.info("Model churn dimuat dari %s (%d fitur)", MODEL_PATH, len(self._model.feature_names_in_))
 
     @property
     def model(self):
