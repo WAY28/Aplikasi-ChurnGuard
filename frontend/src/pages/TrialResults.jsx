@@ -5,7 +5,7 @@ import { MAX_TRIAL_ATTEMPTS, getAttemptsUsed, hasTrialAttemptsLeft } from "../ut
 import { formatPercent, riskLabel, riskTone } from "../utils/format";
 import "./TrialResults.css";
 
-const MODEL_ACCURACY_LABEL = "98%";
+const MODEL_ACCURACY_LABEL = "98,05%";
 
 export default function TrialResults() {
   const location = useLocation();

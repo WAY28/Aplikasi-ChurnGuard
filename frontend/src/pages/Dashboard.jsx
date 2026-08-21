@@ -13,7 +13,7 @@ import { CONTACT_STATUS_LABELS } from "../utils/format";
 import { useOnlineStatus } from "../utils/useOnlineStatus";
 import "./Dashboard.css";
 
-const MODEL_ACCURACY_LABEL = "98%";
+const MODEL_ACCURACY_LABEL = "98,05%";
 const PAGE_SIZE = 20;
 const EMPTY_RESULT = { items: [], total: 0, total_pages: 0, high_risk_total: 0 };
 

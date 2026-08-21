@@ -12,7 +12,7 @@ di-hardcode -- supaya urutan kolom tidak pernah salah walau model diganti.
 Kolom kategorikal di-encode dengan mapping berikut, hasil label-encoding
 alfabetis (perilaku default sklearn.preprocessing.LabelEncoder) atas dataset
 "E Commerce Dataset.xlsx" yang jadi sumber training model ini -- sudah
-divalidasi: prediksi dengan mapping ini mencapai akurasi 98.6% saat
+divalidasi: prediksi dengan mapping ini mencapai akurasi 98,05% saat
 dicocokkan ke kolom Churn asli di seluruh 5630 baris dataset training.
 """
 
