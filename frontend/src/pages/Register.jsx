@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { ApiError } from "../api/client";
 import Logo from "../components/Logo";
+import { PASSWORD_HINT, passwordError } from "../utils/password";
 import "./AuthForm.css";
 
 export default function Register() {
@@ -28,8 +29,9 @@ export default function Register() {
       setError("Konfirmasi password tidak sama dengan password.");
       return;
     }
-    if (password.length < 6) {
-      setError("Password minimal 6 karakter.");
+    const pwError = passwordError(password);
+    if (pwError) {
+      setError(pwError);
       return;
     }
 
@@ -89,11 +91,11 @@ export default function Register() {
               type="password"
               autoComplete="new-password"
               required
-              minLength={6}
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <div className="field-hint">Minimal 6 karakter</div>
+            <div className="field-hint">{PASSWORD_HINT}</div>
           </div>
           <div className="field">
             <label htmlFor="confirm_password">Konfirmasi Password</label>

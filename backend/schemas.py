@@ -1,16 +1,34 @@
+import re
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
 # ---- Auth ----
+
+PASSWORD_MIN_LENGTH = 8
+
+
+def _validate_password_strength(password: str) -> str:
+    if len(password) < PASSWORD_MIN_LENGTH:
+        raise ValueError(f"Password minimal {PASSWORD_MIN_LENGTH} karakter")
+    if not re.search(r"[A-Za-z]", password):
+        raise ValueError("Password harus mengandung minimal satu huruf")
+    if not re.search(r"\d", password):
+        raise ValueError("Password harus mengandung minimal satu angka")
+    return password
 
 
 class RegisterRequest(BaseModel):
     business_name: str = Field(min_length=1, max_length=255)
     email: EmailStr
-    password: str = Field(min_length=6, max_length=128)
+    password: str = Field(min_length=PASSWORD_MIN_LENGTH, max_length=128)
+
+    @field_validator("password")
+    @classmethod
+    def check_password_strength(cls, value: str) -> str:
+        return _validate_password_strength(value)
 
 
 class RegisterResponse(BaseModel):
@@ -26,9 +44,30 @@ class LoginRequest(BaseModel):
     password: str
 
 
-class TokenResponse(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ForgotPasswordResponse(BaseModel):
+    message: str
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str = Field(min_length=PASSWORD_MIN_LENGTH, max_length=128)
+
+    @field_validator("new_password")
+    @classmethod
+    def check_password_strength(cls, value: str) -> str:
+        return _validate_password_strength(value)
+
+
+class ResetPasswordResponse(BaseModel):
+    message: str
+
+
+class MessageResponse(BaseModel):
+    message: str
 
 
 # ---- Customer ----

@@ -16,6 +16,8 @@ class User(Base):
 
     upload_sessions = relationship("UploadSession", back_populates="user", cascade="all, delete-orphan")
     customers = relationship("Customer", back_populates="user", cascade="all, delete-orphan")
+    reset_tokens = relationship("PasswordResetToken", back_populates="user", cascade="all, delete-orphan")
+    refresh_tokens = relationship("RefreshToken", back_populates="user", cascade="all, delete-orphan")
 
 
 class UploadSession(Base):
@@ -70,3 +72,36 @@ class Customer(Base):
 
     user = relationship("User", back_populates="customers")
     upload_session = relationship("UploadSession", back_populates="customers")
+
+
+class PasswordResetToken(Base):
+    __tablename__ = "password_reset_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    # Hash SHA-256 dari token acak yang dikirim lewat email -- token asli tidak
+    # pernah disimpan di DB (mirip prinsip password_hash), supaya kalau tabel ini
+    # bocor, token tetap tidak bisa dipakai langsung.
+    token_hash = Column(String(64), unique=True, nullable=False, index=True)
+    expires_at = Column(TIMESTAMP(timezone=True), nullable=False)
+    used_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
+
+    user = relationship("User", back_populates="reset_tokens")
+
+
+class RefreshToken(Base):
+    __tablename__ = "refresh_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    # Sama seperti PasswordResetToken -- hash SHA-256, token asli tidak pernah
+    # disimpan, cuma dikirim sekali ke klien lewat cookie httpOnly.
+    token_hash = Column(String(64), unique=True, nullable=False, index=True)
+    expires_at = Column(TIMESTAMP(timezone=True), nullable=False)
+    # NULL = masih aktif. Diisi saat dipakai untuk refresh (rotasi) ATAU saat
+    # user logout ATAU saat kedapatan dipakai ulang (dianggap dicuri).
+    revoked_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
+
+    user = relationship("User", back_populates="refresh_tokens")

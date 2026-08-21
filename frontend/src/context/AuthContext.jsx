@@ -1,62 +1,49 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { getToken, onUnauthorized, setToken as persistToken } from "../api/client";
+import { onUnauthorized } from "../api/client";
 import * as endpoints from "../api/endpoints";
 
-const USER_KEY = "churnguard_user";
 const AuthContext = createContext(null);
 
-function decodeJwtExp(token) {
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return payload.exp ? payload.exp * 1000 : null;
-  } catch {
-    return null;
-  }
-}
-
-function isTokenValid(token) {
-  if (!token) return false;
-  const expMs = decodeJwtExp(token);
-  if (!expMs) return true; // tidak bisa dibaca, anggap valid, biar backend yang tolak kalau salah
-  return Date.now() < expMs;
-}
-
-function loadStoredUser() {
-  try {
-    const raw = localStorage.getItem(USER_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
 export function AuthProvider({ children }) {
-  const [token, setTokenState] = useState(() => {
-    const stored = getToken();
-    return isTokenValid(stored) ? stored : null;
-  });
-  const [user, setUser] = useState(() => (token ? loadStoredUser() : null));
+  const [user, setUser] = useState(null);
+  // Token sekarang di cookie httpOnly -- JS tidak bisa membacanya sama sekali,
+  // jadi satu-satunya cara tahu "sedang login atau tidak" adalah menanyakan
+  // ke server (GET /auth/me). `loading` menahan render rute terproteksi
+  // sampai jawabannya diketahui, supaya tidak sempat "kelihatan" redirect ke
+  // /login padahal sebenarnya sesi masih valid.
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // NFR-3: token 24 jam -- kalau sesi kadaluarsa saat request lain (401), logout otomatis
+    let cancelled = false;
+    endpoints
+      .getMe()
+      .then((me) => {
+        if (!cancelled) setUser(me);
+      })
+      .catch(() => {
+        if (!cancelled) setUser(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    // Dipanggil client.js saat access token kedaluwarsa DAN refresh-nya juga
+    // gagal (refresh token habis/direvoke) -- satu-satunya jalan keluar saat
+    // itu ya logout di sisi UI (cookie di server sudah tidak valid lagi).
     onUnauthorized(() => {
-      persistToken(null);
-      localStorage.removeItem(USER_KEY);
-      setTokenState(null);
       setUser(null);
     });
   }, []);
 
   const login = useCallback(async (email, password) => {
-    const result = await endpoints.login({ email, password });
-    persistToken(result.access_token);
-    setTokenState(result.access_token);
-    setUser((prevUser) => {
-      const nextUser = { email, business_name: prevUser?.email === email ? prevUser.business_name : null };
-      localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
-      return nextUser;
-    });
-    return result;
+    const me = await endpoints.login({ email, password });
+    setUser(me);
+    return me;
   }, []);
 
   const register = useCallback(async (businessName, email, password) => {
@@ -65,26 +52,29 @@ export function AuthProvider({ children }) {
       email,
       password,
     });
-    // api.md: register tidak mengembalikan token, jadi langsung login pakai kredensial yang sama
-    const loginResult = await endpoints.login({ email, password });
-    persistToken(loginResult.access_token);
-    setTokenState(loginResult.access_token);
-    const nextUser = { email: result.email, business_name: result.business_name };
-    localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
-    setUser(nextUser);
+    // api.md: register tidak set cookie, jadi langsung login pakai kredensial yang sama
+    const me = await endpoints.login({ email, password });
+    setUser(me);
     return result;
   }, []);
 
-  const logout = useCallback(() => {
-    persistToken(null);
-    localStorage.removeItem(USER_KEY);
-    setTokenState(null);
-    setUser(null);
+  const logout = useCallback(async () => {
+    try {
+      await endpoints.logout(); // revoke refresh token di server, bukan cuma bersih-bersih di sini
+    } finally {
+      setUser(null);
+    }
+  }, []);
+
+  // Dipanggil setelah PATCH /account sukses, supaya business_name/email yang
+  // ditampilkan (mis. di Navbar) langsung ter-update tanpa perlu reload.
+  const updateUser = useCallback((patch) => {
+    setUser((prevUser) => ({ ...prevUser, ...patch }));
   }, []);
 
   const value = useMemo(
-    () => ({ token, user, isAuthenticated: !!token, login, register, logout }),
-    [token, user, login, register, logout],
+    () => ({ user, loading, isAuthenticated: !!user, login, register, logout, updateUser }),
+    [user, loading, login, register, logout, updateUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -61,7 +61,12 @@ export default function Login() {
             />
           </div>
           <div className="field">
-            <label htmlFor="password">Password</label>
+            <div className="row-between">
+              <label htmlFor="password">Password</label>
+              <Link to="/forgot-password" className="auth-inline-link">
+                Lupa password?
+              </Link>
+            </div>
             <input
               id="password"
               type="password"

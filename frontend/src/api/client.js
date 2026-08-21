@@ -1,5 +1,4 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
-const TOKEN_KEY = "churnguard_token";
 
 export class ApiError extends Error {
   constructor(message, status, detail) {
@@ -9,43 +8,66 @@ export class ApiError extends Error {
   }
 }
 
-export function getToken() {
-  return localStorage.getItem(TOKEN_KEY);
-}
-
-export function setToken(token) {
-  if (token) localStorage.setItem(TOKEN_KEY, token);
-  else localStorage.removeItem(TOKEN_KEY);
-}
-
-// Dipanggil dari luar (lihat AuthContext) saat token basi/invalid (401) supaya
+// Dipanggil dari luar (lihat AuthContext) saat sesi benar-benar tidak bisa
+// dipulihkan lagi (access token kedaluwarsa DAN refresh gagal), supaya
 // seluruh aplikasi ter-logout serentak, bukan cuma request yang gagal.
 let unauthorizedHandler = null;
 export function onUnauthorized(handler) {
   unauthorizedHandler = handler;
 }
 
+function rawFetch(path, { method, body, isForm, headers }) {
+  return fetch(`${API_BASE_URL}${path}`, {
+    method,
+    headers,
+    // WAJIB: token sekarang di cookie httpOnly (bukan localStorage), jadi
+    // fetch harus eksplisit ikut kirim/terima cookie lintas origin.
+    credentials: "include",
+    body: isForm ? body : body ? JSON.stringify(body) : undefined,
+  });
+}
+
+// Dedupe: kalau beberapa request gagal 401 bersamaan, semuanya nunggu SATU
+// panggilan /auth/refresh yang sama, bukan masing-masing refresh sendiri-sendiri.
+let refreshPromise = null;
+function refreshAccessToken() {
+  if (!refreshPromise) {
+    refreshPromise = rawFetch("/auth/refresh", { method: "POST" })
+      .then((res) => res.ok)
+      .catch(() => false)
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
 async function request(path, { method = "GET", body, isForm = false, auth = true } = {}) {
   const headers = {};
   if (!isForm) headers["Content-Type"] = "application/json";
-  if (auth) {
-    const token = getToken();
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-  }
 
   let response;
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
-      method,
-      headers,
-      body: isForm ? body : body ? JSON.stringify(body) : undefined,
-    });
+    response = await rawFetch(path, { method, body, isForm, headers });
   } catch {
     throw new ApiError("Tidak bisa terhubung ke server. Periksa koneksi internet Anda.", 0, null);
   }
 
+  // `auth: false` dipakai endpoint publik (login/register/forgot-password/trial)
+  // -- 401 di situ artinya "kredensial salah", BUKAN "sesi kedaluwarsa", jadi
+  // tidak boleh memicu coba-refresh atau auto-logout.
   if (response.status === 401 && auth) {
-    unauthorizedHandler?.();
+    const refreshed = await refreshAccessToken();
+    if (refreshed) {
+      try {
+        response = await rawFetch(path, { method, body, isForm, headers }); // retry sekali
+      } catch {
+        throw new ApiError("Tidak bisa terhubung ke server. Periksa koneksi internet Anda.", 0, null);
+      }
+    }
+    if (response.status === 401) {
+      unauthorizedHandler?.();
+    }
   }
 
   if (!response.ok) {
@@ -78,5 +100,6 @@ export const api = {
   get: (path, opts) => request(path, { ...opts, method: "GET" }),
   post: (path, body, opts) => request(path, { ...opts, method: "POST", body }),
   patch: (path, body, opts) => request(path, { ...opts, method: "PATCH", body }),
+  del: (path, body, opts) => request(path, { ...opts, method: "DELETE", body }),
   postForm: (path, formData, opts) => request(path, { ...opts, method: "POST", body: formData, isForm: true }),
 };

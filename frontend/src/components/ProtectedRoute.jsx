@@ -4,7 +4,13 @@ import Navbar from "./Navbar";
 import OfflineBanner from "./OfflineBanner";
 
 export default function ProtectedRoute() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+
+  // Masih menunggu jawaban GET /auth/me -- jangan redirect dulu, supaya sesi
+  // yang sebenarnya valid tidak sempat "kelihatan" ter-logout sesaat.
+  if (loading) {
+    return null;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
