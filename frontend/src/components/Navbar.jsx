@@ -1,4 +1,4 @@
-import { LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Logo from "./Logo";
@@ -33,6 +33,9 @@ export default function Navbar() {
         </nav>
         <div className="navbar-user">
           <span className="navbar-business">{user?.business_name}</span>
+          <NavLink to="/account" className="navbar-icon-btn" aria-label="Pengaturan akun" title="Pengaturan akun">
+            <Settings size={16} />
+          </NavLink>
           <button type="button" className="navbar-logout" onClick={handleLogout}>
             <LogOut size={16} />
             <span>Keluar</span>

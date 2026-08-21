@@ -102,6 +102,7 @@ a {
 /* Link teks biasa di dalam kalimat (bukan tombol) tetap digarisbawahi supaya
    tidak cuma mengandalkan warna sebagai penanda -- penting untuk aksesibilitas. */
 .auth-footer a,
+.auth-inline-link,
 .info-notice a {
   text-decoration: underline;
   /* Perbesar area tap link inline (target sentuh ~44px) tanpa mengganggu alur
@@ -215,6 +216,28 @@ textarea {
   filter: brightness(0.92);
 }
 
+.btn-danger {
+  background: var(--color-danger);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(28, 37, 48, 0.08);
+}
+
+.btn-danger:hover:not(:disabled) {
+  filter: brightness(0.92);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -6px rgba(28, 37, 48, 0.35);
+}
+
+.btn-danger-outline {
+  background: transparent;
+  color: var(--color-danger);
+  border: 1.5px solid var(--color-danger);
+}
+
+.btn-danger-outline:hover:not(:disabled) {
+  background: var(--color-danger-bg);
+}
+
 .btn-block {
   width: 100%;
 }
@@ -310,6 +333,23 @@ textarea {
 }
 
 .error-banner svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.success-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.success-banner svg {
   width: 18px;
   height: 18px;
   flex-shrink: 0;

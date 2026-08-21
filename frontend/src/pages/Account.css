@@ -1,0 +1,26 @@
+.account-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  max-width: 560px;
+}
+
+.account-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-primary);
+  margin-bottom: var(--space-4);
+}
+
+.account-card-header h3 {
+  margin: 0;
+}
+
+.account-danger-zone {
+  border-color: var(--color-danger-bg);
+}
+
+.account-danger-zone .account-card-header {
+  color: var(--color-danger);
+}

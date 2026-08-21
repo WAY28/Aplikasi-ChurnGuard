@@ -191,6 +191,28 @@ class PaginatedUploadSessionsOut(BaseModel):
     total_pages: int
 
 
+# ---- Kelola akun ----
+
+
+class DeleteAccountRequest(BaseModel):
+    password: str
+
+
+class UpdateAccountRequest(BaseModel):
+    business_name: str | None = Field(None, min_length=1, max_length=255)
+    email: EmailStr | None = None
+    # Wajib diisi kalau mengubah email ATAU password (lihat routers/account.py)
+    current_password: str | None = None
+    new_password: str | None = Field(None, min_length=PASSWORD_MIN_LENGTH, max_length=128)
+
+    @field_validator("new_password")
+    @classmethod
+    def check_new_password_strength(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        return _validate_password_strength(value)
+
+
 # ---- Trial tanpa akun (publik, tidak disimpan ke DB) ----
 
 
