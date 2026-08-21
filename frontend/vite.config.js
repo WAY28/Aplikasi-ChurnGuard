@@ -28,13 +28,14 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,png,ico}"],
-        // Backend API ada di origin lain (port 8000) dan requestnya butuh header
-        // Authorization (preflighted). Membiarkan service worker meng-intersep
-        // fetch cross-origin semacam itu (lewat runtimeCaching) terbukti membuat
-        // request GAGAL TOTAL (net::ERR_FAILED), bukan cuma gagal di-cache --
-        // jadi sengaja TIDAK diintersep di sini. NFR-13 (data terakhir tetap
-        // tampil saat offline) diimplementasikan di level aplikasi lewat
-        // localStorage, lihat src/utils/offlineCache.js.
+        // Backend API ada di origin lain (port 8000) dan requestnya pakai
+        // credentials:"include" (cookie httpOnly) yang juga preflighted.
+        // Membiarkan service worker meng-intersep fetch cross-origin semacam
+        // itu (lewat runtimeCaching) terbukti membuat request GAGAL TOTAL
+        // (net::ERR_FAILED), bukan cuma gagal di-cache -- jadi sengaja TIDAK
+        // diintersep di sini. NFR-13 (data terakhir tetap tampil saat offline)
+        // diimplementasikan di level aplikasi lewat localStorage, lihat
+        // src/utils/offlineCache.js.
         navigateFallbackDenylist: [/^\/api\//],
       },
       devOptions: {
