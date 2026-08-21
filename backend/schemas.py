@@ -174,6 +174,23 @@ class UploadSessionOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class PaginatedCustomersOut(BaseModel):
+    items: list[CustomerOut]
+    page: int
+    limit: int
+    total: int
+    total_pages: int
+    high_risk_total: int
+
+
+class PaginatedUploadSessionsOut(BaseModel):
+    items: list[UploadSessionOut]
+    page: int
+    limit: int
+    total: int
+    total_pages: int
+
+
 # ---- Trial tanpa akun (publik, tidak disimpan ke DB) ----
 
 

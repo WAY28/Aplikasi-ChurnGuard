@@ -1,18 +1,12 @@
 .history-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  align-items: stretch;
+  gap: var(--space-2);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  text-decoration: none;
-  color: inherit;
-  flex-wrap: wrap;
   box-shadow: var(--shadow-card);
   transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
-  touch-action: manipulation;
 }
 
 .history-row:hover {
@@ -20,6 +14,40 @@
   background: var(--color-info-bg);
   transform: translateY(-2px);
   box-shadow: var(--shadow-card-hover);
+}
+
+.history-row-link {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  text-decoration: none;
+  color: inherit;
+  flex-wrap: wrap;
+  min-width: 0;
+  touch-action: manipulation;
+}
+
+.history-row-delete {
+  flex-shrink: 0;
+  width: 44px;
+  border: none;
+  border-left: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.history-row-delete:hover {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
 }
 
 .history-row-main {

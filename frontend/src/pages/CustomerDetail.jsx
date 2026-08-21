@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, Mail, MessageCircle, PackageOpen } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { ArrowLeft, Mail, MessageCircle, PackageOpen, Trash2 } from "lucide-react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Badge from "../components/Badge";
+import ConfirmDialog from "../components/ConfirmDialog";
 import FeatureImportanceBars from "../components/FeatureImportanceBars";
 import CustomerDetailSkeleton from "../components/CustomerDetailSkeleton";
 import EmptyState from "../components/EmptyState";
 import { useAuth } from "../context/AuthContext";
-import { getCustomer, updateContactStatus } from "../api/endpoints";
+import { deleteCustomer, getCustomer, updateContactStatus } from "../api/endpoints";
 import { buildMailtoLink, buildWaLink, defaultEmailBody, defaultEmailSubject, defaultWaMessage } from "../utils/contact";
 import { contactStatusLabel, contactStatusTone, formatDate, formatPercent, riskLabel, riskTone } from "../utils/format";
 import { loadCache, saveCache } from "../utils/offlineCache";
@@ -15,6 +16,7 @@ import "./CustomerDetail.css";
 export default function CustomerDetail() {
   const { id } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const cacheKey = `customer:${id}`;
 
   const [customer, setCustomer] = useState(null);
@@ -23,6 +25,9 @@ export default function CustomerDetail() {
   const [error, setError] = useState("");
   const [fromCache, setFromCache] = useState(false);
   const [contacting, setContacting] = useState(null); // "wa" | "email" | null
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const fetchCustomer = useCallback(async () => {
     setLoading(true);
@@ -76,6 +81,18 @@ export default function CustomerDetail() {
       setError(err.message || "Gagal memperbarui status kontak. Coba lagi dalam beberapa saat.");
     } finally {
       setContacting(null);
+    }
+  }
+
+  async function handleDelete() {
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      await deleteCustomer(id);
+      navigate("/dashboard");
+    } catch (err) {
+      setDeleteError(err.message || "Gagal menghapus pelanggan. Coba lagi.");
+      setDeleting(false);
     }
   }
 
@@ -197,6 +214,29 @@ export default function CustomerDetail() {
           <DetailItem label="Kategori Favorit" value={customer.prefered_order_cat || "-"} />
         </dl>
       </div>
+
+      <button
+        type="button"
+        className="btn btn-danger-outline btn-block"
+        onClick={() => setConfirmingDelete(true)}
+      >
+        <Trash2 size={18} />
+        <span>Hapus Pelanggan Ini</span>
+      </button>
+
+      <ConfirmDialog
+        open={confirmingDelete}
+        title="Hapus pelanggan ini?"
+        message={`Data ${customer.name || "pelanggan ini"} beserta riwayat prediksinya akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.`}
+        confirmLabel="Ya, Hapus"
+        loading={deleting}
+        error={deleteError}
+        onConfirm={handleDelete}
+        onCancel={() => {
+          setConfirmingDelete(false);
+          setDeleteError("");
+        }}
+      />
     </div>
   );
 }

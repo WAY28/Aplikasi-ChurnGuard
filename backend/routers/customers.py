@@ -1,16 +1,21 @@
+import logging
+import math
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, status
+from sqlalchemy import func, nullslast, or_
 from sqlalchemy.orm import Session
 
 import models
 import schemas
 from auth import get_current_user
-from constants import CUSTOMER_FEATURE_FIELDS, feature_dict
+from constants import CUSTOMER_FEATURE_FIELDS, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, VALID_CONTACT_STATUSES, feature_dict
 from database import get_db
 from errors import handle_prediction_errors
 from ml.predictor import churn_model
 from upload_utils import parse_upload_file
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/customers", tags=["customers"])
 
@@ -151,6 +156,11 @@ async def upload_customers(
     db.commit()
     db.refresh(upload_session)
 
+    logger.info(
+        "Upload diproses: user_id=%s upload_session_id=%s filename=%s total=%d risiko_tinggi=%d",
+        current_user.id, upload_session.id, filename, upload_session.total_customers, high_risk_count,
+    )
+
     return schemas.UploadResponse(
         upload_session_id=upload_session.id,
         total_customers=upload_session.total_customers,
@@ -158,17 +168,58 @@ async def upload_customers(
     )
 
 
-@router.get("", response_model=list[schemas.CustomerOut])
+@router.get("", response_model=schemas.PaginatedCustomersOut)
 def list_customers(
     upload_session_id: int | None = None,
+    search: str | None = Query(None, max_length=255, description="Cari berdasarkan nama atau telepon"),
+    risk: int | None = Query(None, ge=0, le=1, description="Filter status risiko: 1 = risiko tinggi, 0 = aman"),
+    contact_status: str | None = Query(None, description="Filter status kontak"),
+    page: int = Query(1, ge=1),
+    limit: int = Query(DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE),
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
+    if contact_status is not None and contact_status not in VALID_CONTACT_STATUSES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"contact_status tidak valid. Pilihan yang diterima: {', '.join(VALID_CONTACT_STATUSES)}",
+        )
+
     # NFR-4: selalu filter user_id dari token, tidak pernah percaya input lain
     query = db.query(models.Customer).filter(models.Customer.user_id == current_user.id)
     if upload_session_id is not None:
         query = query.filter(models.Customer.upload_session_id == upload_session_id)
-    return query.order_by(models.Customer.created_at.desc()).all()
+    if search:
+        like_pattern = f"%{search.strip()}%"
+        query = query.filter(or_(models.Customer.name.ilike(like_pattern), models.Customer.phone.ilike(like_pattern)))
+    if risk is not None:
+        query = query.filter(models.Customer.churn_prediction == risk)
+    if contact_status is not None:
+        query = query.filter(models.Customer.contact_status == contact_status)
+
+    total = query.with_entities(func.count(models.Customer.id)).scalar()
+    high_risk_total = query.filter(models.Customer.churn_prediction == 1).with_entities(
+        func.count(models.Customer.id)
+    ).scalar()
+
+    # Risiko tertinggi tampil paling atas by default (fitur sudah ada sebelum
+    # pagination) -- diterapkan di query, bukan di frontend, supaya urutan
+    # tetap konsisten lintas halaman.
+    items = (
+        query.order_by(nullslast(models.Customer.churn_probability.desc()), models.Customer.created_at.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
+
+    return schemas.PaginatedCustomersOut(
+        items=items,
+        page=page,
+        limit=limit,
+        total=total,
+        total_pages=max(math.ceil(total / limit), 1) if total else 0,
+        high_risk_total=high_risk_total,
+    )
 
 
 @router.get("/{customer_id}", response_model=schemas.CustomerDetailOut)
@@ -203,3 +254,15 @@ def update_contact_status(
         contact_status=customer.contact_status,
         contacted_at=customer.contacted_at,
     )
+
+
+@router.delete("/{customer_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_customer(
+    customer_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    customer = get_customer_or_404(db, customer_id, current_user.id)
+    db.delete(customer)
+    db.commit()
+    logger.info("Pelanggan dihapus: user_id=%s customer_id=%s", current_user.id, customer_id)

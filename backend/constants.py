@@ -5,6 +5,11 @@ VALID_CONTACT_STATUSES = [
     "retensi_berhasil",
 ]
 
+# Pagination default & batas atas (GET /customers, GET /upload-sessions) --
+# batas atas mencegah satu request menarik seluruh tabel sekaligus.
+DEFAULT_PAGE_SIZE = 20
+MAX_PAGE_SIZE = 200
+
 # Nama kolom fitur (snake_case, persis skema `customers` di database.md) yang
 # dipakai untuk prediksi. Urutan di sini hanya untuk kenyamanan pembacaan --
 # urutan aktual yang dikirim ke model selalu mengikuti `model.feature_names_in_`
