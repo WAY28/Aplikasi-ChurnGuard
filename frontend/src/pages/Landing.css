@@ -19,7 +19,10 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(11, 23, 57, 0.72);
+  /* Opacity tinggi (bukan cuma blur) supaya navbar tetap kelihatan navy
+     solid, tidak ikut "belang" menyerap warna animasi PulseHero yang
+     lewat di baliknya. */
+  background: rgba(11, 23, 57, 0.96);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
