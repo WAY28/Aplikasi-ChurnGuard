@@ -75,24 +75,40 @@ export default function Landing() {
 
   return (
     <main className="page landing">
+      {/* ---------- NAVBAR ---------- */}
+      {/* Sticky di atas, terpisah dari hero section, supaya tetap kelihatan
+          (dan "Masuk"/"Daftar" tetap gampang dijangkau) walau user sudah
+          scroll jauh ke bawah -- beda dari topbar lama yang cuma ikut lewat
+          bareng hero. */}
+      <header className="landing-navbar">
+        <div className="landing-container landing-navbar-inner">
+          <Link to="/" className="landing-navbar-brand">
+            <Logo size="sm" />
+            <span className="landing-wordmark">ChurnGuard</span>
+          </Link>
+
+          <nav className="landing-navbar-links" aria-label="Navigasi utama">
+            <a href="#cara-kerja">Cara Kerja</a>
+            <a href="#fitur">Fitur</a>
+          </nav>
+
+          <div className="landing-navbar-actions">
+            <Link to="/login" className="landing-navbar-login">
+              Masuk
+            </Link>
+            <Link to="/register" className="btn btn-primary landing-navbar-cta">
+              Daftar
+            </Link>
+          </div>
+        </div>
+      </header>
+
       {/* ---------- HERO ---------- */}
       <section className="landing-hero-section">
         <PulseHero />
         <div className="landing-hero-scrim" aria-hidden="true" />
 
         <div className="landing-container">
-          {/* Topbar lebar penuh, DI LUAR grid 2-kolom -- supaya "Masuk" selalu
-              nempel di tepi kanan halaman, bukan cuma tepi kanan kolom teks
-              (yang di desktop cuma separuh lebar, bikin link-nya "mengambang"
-              sendirian di tengah). */}
-          <div className="landing-topbar">
-            <Logo size="sm" />
-            <span className="landing-wordmark">ChurnGuard</span>
-            <Link to="/login" className="landing-topbar-login">
-              Masuk
-            </Link>
-          </div>
-
           <div className="landing-hero-grid">
             <div className="landing-hero-copy">
               <span className="landing-eyebrow stagger-item" style={{ "--stagger-index": 0 }}>
@@ -187,7 +203,11 @@ export default function Landing() {
       </section>
 
       {/* ---------- CARA KERJA ---------- */}
-      <section className={`landing-container landing-section ${stepsInView ? "in-view" : ""}`} ref={stepsRef}>
+      <section
+        id="cara-kerja"
+        className={`landing-container landing-section ${stepsInView ? "in-view" : ""}`}
+        ref={stepsRef}
+      >
         <div className="landing-section-heading stagger-item reveal-on-scroll" style={{ "--stagger-index": 0 }}>
           <h2>Tiga langkah, tanpa ribet</h2>
           <p>Dari data mentah jadi daftar aksi nyata, semuanya di dalam satu aplikasi.</p>
@@ -208,7 +228,7 @@ export default function Landing() {
       </section>
 
       {/* ---------- FITUR ---------- */}
-      <section className={`landing-features-section ${featuresInView ? "in-view" : ""}`} ref={featuresRef}>
+      <section id="fitur" className={`landing-features-section ${featuresInView ? "in-view" : ""}`} ref={featuresRef}>
         <div className="landing-orb landing-orb-info" aria-hidden="true" />
         <div className="landing-orb landing-orb-highlight" aria-hidden="true" />
 
