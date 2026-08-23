@@ -14,6 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
 import PulseHero from "../components/PulseHero";
 import { getRemainingAttempts } from "../utils/trial";
+import { useScrollReveal } from "../utils/useScrollReveal";
 import "./Landing.css";
 
 const STEPS = [
@@ -66,6 +67,11 @@ const PREVIEW_CUSTOMERS = [
 export default function Landing() {
   const navigate = useNavigate();
   const remaining = getRemainingAttempts();
+
+  const [stepsRef, stepsInView] = useScrollReveal();
+  const [featuresRef, featuresInView] = useScrollReveal();
+  const [proofRef, proofInView] = useScrollReveal();
+  const [ctaRef, ctaInView] = useScrollReveal();
 
   return (
     <main className="page landing">
@@ -175,15 +181,15 @@ export default function Landing() {
       </section>
 
       {/* ---------- CARA KERJA ---------- */}
-      <section className="landing-container landing-section">
-        <div className="landing-section-heading">
+      <section className={`landing-container landing-section ${stepsInView ? "in-view" : ""}`} ref={stepsRef}>
+        <div className="landing-section-heading stagger-item reveal-on-scroll" style={{ "--stagger-index": 0 }}>
           <h2>Tiga langkah, tanpa ribet</h2>
           <p>Dari data mentah jadi daftar aksi nyata — semuanya di dalam satu aplikasi.</p>
         </div>
 
         <ol className="landing-steps">
           {STEPS.map((step, i) => (
-            <li className="landing-step stagger-item" style={{ "--stagger-index": i }} key={step.title}>
+            <li className="landing-step stagger-item reveal-on-scroll" style={{ "--stagger-index": i + 1 }} key={step.title}>
               <span className="landing-step-number">{i + 1}</span>
               <span className="landing-step-icon">
                 <step.icon size={20} />
@@ -196,16 +202,23 @@ export default function Landing() {
       </section>
 
       {/* ---------- FITUR ---------- */}
-      <section className="landing-features-section">
+      <section className={`landing-features-section ${featuresInView ? "in-view" : ""}`} ref={featuresRef}>
+        <div className="landing-orb landing-orb-info" aria-hidden="true" />
+        <div className="landing-orb landing-orb-highlight" aria-hidden="true" />
+
         <div className="landing-container">
-          <div className="landing-section-heading">
+          <div className="landing-section-heading stagger-item reveal-on-scroll" style={{ "--stagger-index": 0 }}>
             <h2>Semua yang dibutuhkan, tidak lebih</h2>
             <p>Dibangun khusus untuk pemilik usaha yang sibuk jualan, bukan main data.</p>
           </div>
 
           <div className="landing-features-grid">
             {FEATURES.map((f, i) => (
-              <div className="landing-feature-card stagger-item" style={{ "--stagger-index": i }} key={f.title}>
+              <div
+                className="landing-feature-card stagger-item reveal-on-scroll"
+                style={{ "--stagger-index": i + 1 }}
+                key={f.title}
+              >
                 <span className="landing-feature-icon">
                   <f.icon size={22} />
                 </span>
@@ -218,28 +231,32 @@ export default function Landing() {
       </section>
 
       {/* ---------- BUKTI SINGKAT ---------- */}
-      <section className="landing-container landing-proof">
-        <div className="landing-proof-item">
+      <section className={`landing-container landing-proof ${proofInView ? "in-view" : ""}`} ref={proofRef}>
+        <div className="landing-proof-item stagger-item reveal-on-scroll" style={{ "--stagger-index": 0 }}>
           <ShieldCheck size={22} />
           <span>Data Anda terisolasi penuh per akun — tidak pernah bocor ke pengguna lain.</span>
         </div>
-        <div className="landing-proof-item">
+        <div className="landing-proof-item stagger-item reveal-on-scroll" style={{ "--stagger-index": 1 }}>
           <Zap size={22} />
           <span>Random Forest teruji, akurasi 98,05% pada data historis pelanggan e-commerce.</span>
         </div>
-        <div className="landing-proof-item">
+        <div className="landing-proof-item stagger-item reveal-on-scroll" style={{ "--stagger-index": 2 }}>
           <CheckCircle2 size={22} />
           <span>Coba dulu 3× tanpa daftar — baru putuskan kalau memang cocok untuk usaha Anda.</span>
         </div>
       </section>
 
       {/* ---------- CTA PENUTUP ---------- */}
-      <section className="landing-cta-section">
-        <div className="landing-container landing-cta text-center">
+      <section className={`landing-cta-section ${ctaInView ? "in-view" : ""}`} ref={ctaRef}>
+        <div className="landing-orb landing-orb-cta" aria-hidden="true" />
+        <div
+          className="landing-container landing-cta text-center stagger-item reveal-on-scroll"
+          style={{ "--stagger-index": 0 }}
+        >
           <h2>Mulai kenali pelanggan Anda hari ini</h2>
           <p>Gratis untuk dicoba, tanpa kartu kredit, tanpa instalasi rumit.</p>
           <div className="landing-cta-actions">
-            <Link to="/register" className="btn btn-primary">
+            <Link to="/register" className="btn btn-primary landing-btn-shimmer">
               Daftar Sekarang
               <ArrowRight size={18} />
             </Link>
