@@ -1,55 +1,111 @@
 .landing {
   position: relative;
+  padding: 0;
 }
 
-/* Section hero: latar navy pekat penuh (full-bleed), dari atas halaman
-   sampai setelah tombol aksi. Ilustrasi jadi lapisan dekoratif di atasnya. */
+/* Container khusus landing, lebih lebar dari .container global (720px) --
+   halaman app tetap sempit/mobile-first, tapi landing page butuh ruang
+   napas di desktop karena ini "etalase", bukan layar kerja. */
+.landing-container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+/* ==================== HERO ==================== */
+
 .landing-hero-section {
   position: relative;
   overflow: hidden;
-  margin-top: calc(-1 * var(--space-5));
-  padding: var(--space-7) 0 var(--space-6);
-  background: linear-gradient(180deg, #0b1739 0%, #17244b 100%);
+  padding: var(--space-5) 0 var(--space-7);
+  background: #0b1739;
 }
 
-.landing-hero-bg {
+/* Scrim di atas PulseHero, di bawah konten -- tanpa ini, node EKG (lingkaran
+   hijau/merah) bisa menimpa langsung di atas judul dan bikin sulit dibaca.
+   Mobile: gelap di ATAS (tempat teks) memudar ke bawah (tempat kartu visual).
+   Desktop: gelap di KIRI (kolom teks) memudar ke kanan (kolom visual). */
+.landing-hero-scrim {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+  background: linear-gradient(180deg, rgba(11, 23, 57, 0.88) 0%, rgba(11, 23, 57, 0.55) 45%, rgba(11, 23, 57, 0.15) 75%);
   pointer-events: none;
-  z-index: 0;
-  opacity: 0.55;
-  filter: blur(6px);
-  transform: scale(1.05);
 }
 
-.landing-hero {
+.landing-hero-grid {
   position: relative;
   z-index: 1;
-  max-width: 480px;
+  display: grid;
+  gap: var(--space-6);
 }
 
-.landing-hero .logo {
-  margin: 0 auto var(--space-4);
+.landing-topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.landing-topbar .logo {
   background: rgba(255, 255, 255, 0.14);
 }
 
-.landing-hero h1 {
+.landing-wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+.landing-topbar-login {
+  margin-left: auto;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 10px 6px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.landing-topbar-login:hover {
   color: #fff;
 }
 
-.landing-tagline {
+.landing-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 166, 35, 0.14);
+  color: var(--color-highlight);
+  border: 1px solid rgba(245, 166, 35, 0.3);
+  border-radius: var(--radius-full);
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+}
+
+.landing-hero-copy h1 {
   color: #fff;
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 2rem;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  max-width: 22ch;
+}
+
+.landing-highlight {
+  color: var(--color-highlight);
+  position: relative;
+  white-space: nowrap;
 }
 
 .landing-desc {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 1rem;
+  max-width: 46ch;
+  margin-top: var(--space-3);
 }
 
 .landing-actions {
@@ -59,12 +115,17 @@
   margin: var(--space-5) 0 0;
 }
 
+.landing-actions .btn {
+  width: 100%;
+}
+
 .landing-actions .btn-primary {
-  background: var(--color-info);
+  background: var(--color-highlight);
+  color: #241a00;
 }
 
 .landing-actions .btn-primary:hover:not(:disabled) {
-  filter: brightness(0.9);
+  background: #ffb838;
 }
 
 .landing-actions .btn-outline {
@@ -83,45 +144,500 @@
   margin: var(--space-3) 0 0;
 }
 
-/* Section fitur: kembali ke latar terang biasa */
-.landing-features-section {
-  padding-top: var(--space-6);
+.landing-stats {
+  display: flex;
+  gap: var(--space-5);
+  margin: var(--space-6) 0 0;
+  padding-top: var(--space-5);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
-.landing-features {
+.landing-stats dt {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: #fff;
+}
+
+.landing-stats dd {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ---- Visual sisi kanan: preview dashboard + kartu mengambang ---- */
+
+.landing-hero-visual {
+  position: relative;
+  z-index: 1;
+  min-height: 280px;
   display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  text-align: left;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-preview-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.55);
+  padding: var(--space-4);
+  transform: rotate(-2deg);
+}
+
+.landing-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.landing-preview-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--color-success);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.landing-preview-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-success);
+  animation: landing-dot-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes landing-dot-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.7);
+  }
+}
+
+.landing-preview-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 7px 0;
+}
+
+.landing-preview-avatar {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-preview-name {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.landing-float-card {
+  position: absolute;
+  right: -6px;
+  bottom: -8px;
+  width: 220px;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: 0 18px 40px -14px rgba(0, 0, 0, 0.5);
+  padding: var(--space-3);
+  animation: landing-float 4s ease-in-out infinite;
+}
+
+@keyframes landing-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.landing-float-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.landing-float-avatar {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-float-header strong {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--color-text);
+}
+
+.landing-float-header span {
+  font-size: 0.7rem;
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+.landing-float-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--color-success);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  padding: 8px;
+}
+
+/* ==================== SECTION HEADING (dipakai bersama) ==================== */
+
+.landing-section {
+  padding-top: var(--space-7);
+}
+
+.landing-section-heading {
+  text-align: center;
   max-width: 480px;
-  margin: 0 auto;
+  margin: 0 auto var(--space-6);
 }
 
-.landing-feature-item {
+.landing-section-heading p {
+  margin: 0;
+}
+
+/* ==================== CARA KERJA ==================== */
+
+.landing-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+  counter-reset: step;
+}
+
+.landing-step {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  text-align: center;
+}
+
+.landing-step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  margin-bottom: var(--space-3);
+}
+
+.landing-step-icon {
   display: flex;
-  gap: var(--space-3);
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+.landing-step strong {
+  display: block;
+  font-family: var(--font-display);
+  margin-bottom: var(--space-1);
+}
+
+.landing-step p {
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+/* ==================== FITUR ==================== */
+
+.landing-features-section {
+  padding-top: var(--space-7);
+}
+
+.landing-features-grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.landing-feature-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.landing-feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-info);
 }
 
 .landing-feature-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  margin-bottom: var(--space-3);
   border-radius: var(--radius-md);
   background: var(--color-info-bg);
   color: var(--color-info);
 }
 
-.landing-feature-item strong {
+.landing-feature-card strong {
   display: block;
-  margin-bottom: 2px;
+  margin-bottom: var(--space-1);
   font-family: var(--font-display);
 }
 
-.landing-feature-item p {
+.landing-feature-card p {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
+}
+
+/* ==================== BUKTI SINGKAT ==================== */
+
+.landing-proof {
+  margin-top: var(--space-7);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.landing-proof-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: 0.88rem;
+}
+
+.landing-proof-item svg {
+  flex-shrink: 0;
+  color: var(--color-success);
+  margin-top: 2px;
+}
+
+/* ==================== CTA PENUTUP ==================== */
+
+.landing-cta-section {
+  margin-top: var(--space-7);
+  background: linear-gradient(135deg, #0b1739, #17244b);
+}
+
+.landing-cta {
+  padding: var(--space-7) var(--space-4);
+  max-width: 480px;
+}
+
+.landing-cta h2 {
+  color: #fff;
+}
+
+.landing-cta p {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.landing-cta-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.landing-cta-actions .btn {
+  width: 100%;
+}
+
+.landing-cta-actions .btn-primary {
+  background: var(--color-highlight);
+  color: #241a00;
+}
+
+.landing-cta-actions .btn-primary:hover:not(:disabled) {
+  background: #ffb838;
+}
+
+.landing-cta-actions .btn-outline {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.landing-cta-actions .btn-outline:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #fff;
+}
+
+/* ==================== FOOTER ==================== */
+
+.landing-footer {
+  padding: var(--space-6) 0 var(--space-5);
+}
+
+.landing-footer-inner {
+  text-align: center;
+}
+
+.landing-footer-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.landing-footer-brand span {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.landing-footer p {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+/* ==================== DESKTOP ==================== */
+
+@media (min-width: 900px) {
+  .landing-hero-section {
+    padding: var(--space-7) 0 calc(var(--space-7) * 1.3);
+  }
+
+  .landing-hero-scrim {
+    background: linear-gradient(
+      100deg,
+      rgba(11, 23, 57, 0.95) 0%,
+      rgba(11, 23, 57, 0.85) 32%,
+      rgba(11, 23, 57, 0.35) 55%,
+      rgba(11, 23, 57, 0.05) 72%
+    );
+  }
+
+  .landing-hero-grid {
+    grid-template-columns: 1.05fr 0.95fr;
+    align-items: center;
+    gap: var(--space-7);
+  }
+
+  .landing-hero-copy h1 {
+    font-size: 3rem;
+    max-width: 16ch;
+  }
+
+  .landing-desc {
+    font-size: 1.1rem;
+  }
+
+  .landing-actions {
+    flex-direction: row;
+  }
+
+  .landing-actions .btn {
+    width: auto;
+  }
+
+  .landing-hero-visual {
+    min-height: 360px;
+  }
+
+  .landing-preview-card {
+    max-width: 400px;
+  }
+
+  .landing-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .landing-step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 44px;
+    left: calc(100% - var(--space-4));
+    width: calc(var(--space-6) + var(--space-4) * 2);
+    border-top: 2px dashed var(--color-border);
+  }
+
+  .landing-features-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .landing-proof {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .landing-cta {
+    max-width: 640px;
+  }
+
+  .landing-cta-actions {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .landing-cta-actions .btn {
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-preview-dot,
+  .landing-float-card {
+    animation: none;
+  }
 }

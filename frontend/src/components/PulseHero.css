@@ -1,0 +1,83 @@
+.pulse-hero {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Garis EKG "menggambar diri sendiri" saat halaman dimuat. 1600 lebih
+   panjang dari path aslinya (~1400) supaya seluruh garis benar-benar
+   tersembunyi di awal, bukan cuma sebagian. */
+.pulse-hero-line {
+  stroke-dasharray: 1600;
+  stroke-dashoffset: 1600;
+  animation: pulse-draw 2.2s cubic-bezier(0.65, 0, 0.35, 1) 0.2s forwards;
+}
+
+@keyframes pulse-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.pulse-hero-node {
+  transform-origin: center;
+  transform-box: fill-box;
+  opacity: 0;
+  animation: pulse-node-in 0.5s ease-out forwards, pulse-node-breathe 2.6s ease-in-out 2.4s infinite;
+  animation-delay: calc(0.4s + var(--delay, 0s)), calc(2.6s + var(--delay, 0s));
+}
+
+@keyframes pulse-node-in {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-node-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.18);
+  }
+}
+
+.pulse-hero-node-danger {
+  filter: drop-shadow(0 0 6px rgba(240, 68, 56, 0.55));
+}
+
+.pulse-hero-node-risk {
+  filter: drop-shadow(0 0 6px rgba(245, 166, 35, 0.5));
+}
+
+.pulse-hero-stars {
+  animation: pulse-twinkle 4s ease-in-out infinite;
+}
+
+@keyframes pulse-twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-hero-line,
+  .pulse-hero-node,
+  .pulse-hero-stars {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
