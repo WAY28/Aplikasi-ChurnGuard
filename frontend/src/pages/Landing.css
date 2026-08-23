@@ -96,6 +96,17 @@
   font-size: 0.9rem;
 }
 
+/* Samakan dengan CTA lain di halaman ini (.landing-actions/.landing-cta-actions):
+   .btn-primary default navy nyaris tak kelihatan di atas navbar yang juga navy. */
+.landing-navbar-cta.btn-primary {
+  background: var(--color-highlight);
+  color: #241a00;
+}
+
+.landing-navbar-cta.btn-primary:hover:not(:disabled) {
+  background: #ffb838;
+}
+
 /* ==================== HERO ==================== */
 
 .landing-hero-section {
