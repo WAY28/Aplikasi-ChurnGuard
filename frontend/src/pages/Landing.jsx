@@ -21,7 +21,7 @@ const STEPS = [
   {
     icon: UploadCloud,
     title: "Unggah Data Pelanggan",
-    desc: "Tinggal drag-and-drop file CSV/Excel yang sudah Anda punya — riwayat transaksi, kontak, apa saja.",
+    desc: "Tinggal drag-and-drop file CSV/Excel yang sudah Anda punya: riwayat transaksi, kontak, apa saja.",
   },
   {
     icon: Target,
@@ -39,7 +39,7 @@ const FEATURES = [
   {
     icon: UploadCloud,
     title: "Upload & Analisis Instan",
-    desc: "Unggah CSV/Excel pelanggan, sistem langsung memprediksi risiko churn tiap orang — tanpa spreadsheet manual.",
+    desc: "Unggah CSV/Excel pelanggan, sistem langsung memprediksi risiko churn tiap orang tanpa spreadsheet manual.",
   },
   {
     icon: Target,
@@ -54,7 +54,7 @@ const FEATURES = [
   {
     icon: Smartphone,
     title: "Dipasang Langsung di HP",
-    desc: "ChurnGuard adalah Progressive Web App — instal seperti aplikasi biasa, dan data terakhir tetap terlihat saat offline.",
+    desc: "ChurnGuard bisa diinstal seperti aplikasi biasa langsung dari browser, dan data terakhir tetap terlihat saat offline.",
   },
 ];
 
@@ -80,29 +80,34 @@ export default function Landing() {
         <PulseHero />
         <div className="landing-hero-scrim" aria-hidden="true" />
 
-        <div className="landing-container landing-hero-grid">
-          <div className="landing-hero-copy">
-            <div className="landing-topbar">
-              <Logo size="sm" />
-              <span className="landing-wordmark">ChurnGuard</span>
-              <Link to="/login" className="landing-topbar-login">
-                Masuk
-              </Link>
-            </div>
+        <div className="landing-container">
+          {/* Topbar lebar penuh, DI LUAR grid 2-kolom -- supaya "Masuk" selalu
+              nempel di tepi kanan halaman, bukan cuma tepi kanan kolom teks
+              (yang di desktop cuma separuh lebar, bikin link-nya "mengambang"
+              sendirian di tengah). */}
+          <div className="landing-topbar">
+            <Logo size="sm" />
+            <span className="landing-wordmark">ChurnGuard</span>
+            <Link to="/login" className="landing-topbar-login">
+              Masuk
+            </Link>
+          </div>
 
-            <span className="landing-eyebrow stagger-item" style={{ "--stagger-index": 0 }}>
+          <div className="landing-hero-grid">
+            <div className="landing-hero-copy">
+              <span className="landing-eyebrow stagger-item" style={{ "--stagger-index": 0 }}>
               <Sparkles size={14} />
               PWA gratis untuk pemilik UMKM
             </span>
 
             <h1 className="stagger-item" style={{ "--stagger-index": 1 }}>
-              Tahu pelanggan mana yang mau <span className="landing-highlight">kabur</span>
-              &nbsp;— sebelum mereka benar-benar pergi.
+              Tahu pelanggan mana yang mau <span className="landing-highlight">kabur</span>, sebelum mereka
+              benar-benar pergi.
             </h1>
 
             <p className="landing-desc stagger-item" style={{ "--stagger-index": 2 }}>
               ChurnGuard membaca data pelanggan yang sudah Anda punya, lalu menandai siapa saja yang berisiko
-              berhenti bertransaksi — lengkap dengan alasannya. Tinggal hubungi lewat WhatsApp, tanpa perlu tim data
+              berhenti bertransaksi, lengkap dengan alasannya. Tinggal hubungi lewat WhatsApp, tanpa perlu tim data
               analyst.
             </p>
 
@@ -177,6 +182,7 @@ export default function Landing() {
               </div>
             </div>
           </div>
+          </div>
         </div>
       </section>
 
@@ -184,7 +190,7 @@ export default function Landing() {
       <section className={`landing-container landing-section ${stepsInView ? "in-view" : ""}`} ref={stepsRef}>
         <div className="landing-section-heading stagger-item reveal-on-scroll" style={{ "--stagger-index": 0 }}>
           <h2>Tiga langkah, tanpa ribet</h2>
-          <p>Dari data mentah jadi daftar aksi nyata — semuanya di dalam satu aplikasi.</p>
+          <p>Dari data mentah jadi daftar aksi nyata, semuanya di dalam satu aplikasi.</p>
         </div>
 
         <ol className="landing-steps">
@@ -234,7 +240,7 @@ export default function Landing() {
       <section className={`landing-container landing-proof ${proofInView ? "in-view" : ""}`} ref={proofRef}>
         <div className="landing-proof-item stagger-item reveal-on-scroll" style={{ "--stagger-index": 0 }}>
           <ShieldCheck size={22} />
-          <span>Data Anda terisolasi penuh per akun — tidak pernah bocor ke pengguna lain.</span>
+          <span>Data Anda terisolasi penuh per akun, tidak pernah bocor ke pengguna lain.</span>
         </div>
         <div className="landing-proof-item stagger-item reveal-on-scroll" style={{ "--stagger-index": 1 }}>
           <Zap size={22} />
@@ -242,7 +248,7 @@ export default function Landing() {
         </div>
         <div className="landing-proof-item stagger-item reveal-on-scroll" style={{ "--stagger-index": 2 }}>
           <CheckCircle2 size={22} />
-          <span>Coba dulu 3× tanpa daftar — baru putuskan kalau memang cocok untuk usaha Anda.</span>
+          <span>Coba dulu 3× tanpa daftar, baru putuskan kalau memang cocok untuk usaha Anda.</span>
         </div>
       </section>
 
