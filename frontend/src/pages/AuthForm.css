@@ -1,6 +1,18 @@
+/* Shell gelap yang menyamai hero landing page, supaya alur Masuk/Daftar
+   terasa menyambung dari landing, bukan lompat ke halaman form generik. */
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background: #0b1739;
+  background-image: radial-gradient(circle at 12% 15%, rgba(245, 166, 35, 0.12), transparent 45%),
+    radial-gradient(circle at 88% 85%, rgba(79, 110, 247, 0.16), transparent 50%);
+}
+
 .auth-page {
   max-width: 420px;
   padding-top: var(--space-6);
+  padding-bottom: var(--space-6);
 }
 
 .auth-logo {
@@ -9,24 +21,50 @@
   margin-bottom: var(--space-4);
 }
 
+/* Chip putih transparan, bukan gradient navy bawaan .logo -- supaya tidak
+   "hilang" di atas background gelap yang senada. */
+.auth-logo .logo {
+  background: rgba(255, 255, 255, 0.14);
+}
+
 .auth-title {
   text-align: center;
+  color: #fff;
+  font-family: var(--font-display);
 }
 
 .auth-subtitle {
   text-align: center;
   margin-bottom: var(--space-5);
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .auth-footer {
   text-align: center;
   margin-top: var(--space-4);
   font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.auth-footer a {
+  color: var(--color-highlight);
+  font-weight: 600;
 }
 
 .auth-inline-link {
   font-size: 0.85rem;
   white-space: nowrap;
+}
+
+/* Form sendiri tetap kartu terang -- kontras & keterbacaan input jauh lebih
+   penting di sini daripada konsistensi warna gelap penuh. */
+.auth-page .btn-primary {
+  background: var(--color-highlight);
+  color: #241a00;
+}
+
+.auth-page .btn-primary:hover:not(:disabled) {
+  background: #ffb838;
 }
 
 .auth-success-banner {

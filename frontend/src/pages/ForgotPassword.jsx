@@ -28,11 +28,11 @@ export default function ForgotPassword() {
   }
 
   return (
-    <main className="page">
+    <main className="page auth-shell">
       <div className="container auth-page">
-        <div className="auth-logo">
+        <Link to="/" className="auth-logo">
           <Logo size="md" />
-        </div>
+        </Link>
         <h1 className="auth-title">Lupa Password</h1>
         <p className="auth-subtitle">Masukkan email akun Anda, kami kirimkan link untuk membuat password baru</p>
 

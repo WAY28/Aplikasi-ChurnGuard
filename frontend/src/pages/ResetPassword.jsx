@@ -49,11 +49,11 @@ export default function ResetPassword() {
 
   if (!token) {
     return (
-      <main className="page">
+      <main className="page auth-shell">
         <div className="container auth-page">
-          <div className="auth-logo">
+          <Link to="/" className="auth-logo">
             <Logo size="md" />
-          </div>
+          </Link>
           <h1 className="auth-title">Link Tidak Valid</h1>
           <div className="card stack text-center">
             <p>Link reset password tidak lengkap. Minta link baru dari halaman lupa password.</p>
@@ -67,11 +67,11 @@ export default function ResetPassword() {
   }
 
   return (
-    <main className="page">
+    <main className="page auth-shell">
       <div className="container auth-page">
-        <div className="auth-logo">
+        <Link to="/" className="auth-logo">
           <Logo size="md" />
-        </div>
+        </Link>
         <h1 className="auth-title">Buat Password Baru</h1>
         <p className="auth-subtitle">Masukkan password baru untuk akun Anda</p>
 

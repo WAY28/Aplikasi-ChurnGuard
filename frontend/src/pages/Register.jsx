@@ -51,11 +51,11 @@ export default function Register() {
   }
 
   return (
-    <main className="page">
+    <main className="page auth-shell">
       <div className="container auth-page">
-        <div className="auth-logo">
+        <Link to="/" className="auth-logo">
           <Logo size="md" />
-        </div>
+        </Link>
         <h1 className="auth-title">Daftar</h1>
         <p className="auth-subtitle">Buat akun ChurnGuard untuk UMKM Anda</p>
 

@@ -38,11 +38,11 @@ export default function Login() {
   }
 
   return (
-    <main className="page">
+    <main className="page auth-shell">
       <div className="container auth-page">
-        <div className="auth-logo">
+        <Link to="/" className="auth-logo">
           <Logo size="md" />
-        </div>
+        </Link>
         <h1 className="auth-title">Masuk</h1>
         <p className="auth-subtitle">Masuk ke akun ChurnGuard Anda</p>
 
