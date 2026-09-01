@@ -1,10 +1,15 @@
 """Pengirim email untuk alur lupa password.
 
 Prioritas pengiriman (dicek di runtime, bukan di import time, supaya gampang
-dites): Resend (kalau RESEND_API_KEY diisi) -> SMTP Gmail/lainnya (kalau
-SMTP_HOST diisi) -> log ke console (mode dev, dipakai kalau dua-duanya kosong
-supaya alur reset password tetap bisa dites end-to-end tanpa kredensial email
-asli).
+dites): Brevo (kalau BREVO_API_KEY diisi) -> Resend (kalau RESEND_API_KEY
+diisi) -> SMTP Gmail/lainnya (kalau SMTP_HOST diisi) -> log ke console (mode
+dev, dipakai kalau semuanya kosong supaya alur reset password tetap bisa
+dites end-to-end tanpa kredensial email asli).
+
+Brevo & Resend dipakai lewat HTTPS API (port 443), bukan SMTP (port 587) --
+ini sengaja, karena banyak platform hosting gratis (termasuk Render) blokir
+koneksi SMTP keluar untuk cegah penyalahgunaan spam, jadi jalur SMTP di bawah
+akan selalu gagal dengan "Network is unreachable" di platform semacam itu.
 """
 
 import json
@@ -30,6 +35,31 @@ def _build_reset_email_body(reset_link: str) -> str:
         "Kalau Anda tidak meminta ini, abaikan saja email ini -- password Anda tidak akan berubah.\n\n"
         "Salam,\nChurnGuard"
     )
+
+
+def _send_via_brevo(to_email: str, body: str) -> None:
+    payload = json.dumps(
+        {
+            "sender": {"email": config.BREVO_FROM_EMAIL},
+            "to": [{"email": to_email}],
+            "subject": RESET_EMAIL_SUBJECT,
+            "textContent": body,
+        }
+    ).encode("utf-8")
+
+    req = urllib.request.Request(
+        "https://api.brevo.com/v3/smtp/email",
+        data=payload,
+        method="POST",
+        headers={
+            "api-key": config.BREVO_API_KEY,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+    )
+    with urllib.request.urlopen(req, timeout=10) as resp:
+        if resp.status >= 300:
+            raise RuntimeError(f"Brevo API mengembalikan status {resp.status}")
 
 
 def _send_via_resend(to_email: str, body: str) -> None:
@@ -76,22 +106,27 @@ def send_reset_email(to_email: str, reset_link: str) -> None:
     respons/timing)."""
     body = _build_reset_email_body(reset_link)
 
-    try:
-        if config.RESEND_API_KEY:
-            _send_via_resend(to_email, body)
-            logger.info("Email reset password terkirim ke %s via Resend", to_email)
+    for provider_name, is_configured, send_fn in (
+        ("Brevo", bool(config.BREVO_API_KEY), _send_via_brevo),
+        ("Resend", bool(config.RESEND_API_KEY), _send_via_resend),
+        ("SMTP", bool(config.SMTP_HOST), _send_via_smtp),
+    ):
+        if not is_configured:
+            continue
+        try:
+            send_fn(to_email, body)
+            logger.info("Email reset password terkirim ke %s via %s", to_email, provider_name)
             return
-        if config.SMTP_HOST:
-            _send_via_smtp(to_email, body)
-            logger.info("Email reset password terkirim ke %s via SMTP", to_email)
-            return
-    except (urllib.error.URLError, smtplib.SMTPException, OSError):
-        logger.exception("Gagal mengirim email reset password ke %s", to_email)
-        # sengaja tidak re-raise -- lihat docstring di atas
+        except (urllib.error.URLError, smtplib.SMTPException, OSError):
+            # sengaja tidak re-raise -- lihat docstring di atas. Tetap dicoba
+            # provider berikutnya (kalau ada) sebelum jatuh ke mode log.
+            logger.exception("Gagal mengirim email reset password ke %s via %s", to_email, provider_name)
 
-    # Mode dev/fallback: tidak ada RESEND_API_KEY maupun SMTP_HOST yang diisi.
+    # Mode dev/fallback: tidak ada provider yang diset ATAU semua provider yang
+    # diset gagal terkirim (lihat log exception di atas untuk detail sebabnya).
     logger.warning(
-        "RESEND_API_KEY/SMTP_HOST belum diset -- link reset password untuk %s dicetak ke log saja:\n%s",
+        "Tidak ada provider email yang berhasil mengirim (atau belum ada yang diset) -- "
+        "link reset password untuk %s dicetak ke log saja:\n%s",
         to_email,
         reset_link,
     )

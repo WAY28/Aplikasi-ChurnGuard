@@ -40,7 +40,9 @@ RESET_TOKEN_EXPIRE_MINUTES = int(os.getenv("RESET_TOKEN_EXPIRE_MINUTES", "60"))
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 # Pengirim email reset password -- lihat email_utils.py.
-# Prioritas: Resend (kalau RESEND_API_KEY diisi) -> SMTP (kalau SMTP_HOST diisi) -> log ke console (dev).
+# Prioritas: Brevo -> Resend -> SMTP -> log ke console (dev).
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+BREVO_FROM_EMAIL = os.getenv("BREVO_FROM_EMAIL", "")
 RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "ChurnGuard <onboarding@resend.dev>")
 SMTP_HOST = os.getenv("SMTP_HOST")
