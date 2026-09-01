@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Float, ForeignKey, Integer, String, TIMESTAMP
+from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, String, TIMESTAMP
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -12,6 +12,7 @@ class User(Base):
     business_name = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
+    is_admin = Column(Boolean, nullable=False, default=False, server_default="false")
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
 
     upload_sessions = relationship("UploadSession", back_populates="user", cascade="all, delete-orphan")

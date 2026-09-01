@@ -35,6 +35,7 @@ class RegisterResponse(BaseModel):
     id: int
     business_name: str
     email: str
+    is_admin: bool = False
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -210,6 +211,42 @@ class UpdateAccountRequest(BaseModel):
     def check_new_password_strength(cls, value: str | None) -> str | None:
         if value is None:
             return value
+        return _validate_password_strength(value)
+
+
+# ---- Admin ----
+
+
+class AdminUserOut(BaseModel):
+    id: int
+    business_name: str
+    email: str
+    is_admin: bool
+    created_at: datetime
+    customer_count: int
+    upload_count: int
+
+
+class PaginatedAdminUsersOut(BaseModel):
+    items: list[AdminUserOut]
+    page: int
+    limit: int
+    total: int
+    total_pages: int
+
+
+class AdminStatsOut(BaseModel):
+    total_users: int
+    total_customers: int
+    total_upload_sessions: int
+
+
+class AdminResetPasswordRequest(BaseModel):
+    new_password: str = Field(min_length=PASSWORD_MIN_LENGTH, max_length=128)
+
+    @field_validator("new_password")
+    @classmethod
+    def check_password_strength(cls, value: str) -> str:
         return _validate_password_strength(value)
 
 

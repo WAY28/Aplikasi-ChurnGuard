@@ -52,6 +52,19 @@ export const deleteUploadSession = (id) => api.del(`/upload-sessions/${id}`);
 export const updateAccount = (payload) => api.patch("/account", payload);
 export const deleteAccount = (password) => api.del("/account", { password });
 
+// ---- Admin ----
+export function listAdminUsers({ page = 1, limit = 20 } = {}) {
+  const params = new URLSearchParams({ page, limit });
+  return api.get(`/admin/users?${params.toString()}`);
+}
+
+export const getAdminStats = () => api.get("/admin/stats");
+
+export const adminResetPassword = (userId, newPassword) =>
+  api.post(`/admin/users/${userId}/reset-password`, { new_password: newPassword });
+
+export const adminDeleteUser = (userId) => api.del(`/admin/users/${userId}`);
+
 // ---- Trial tanpa akun (publik, tidak disimpan ke database) ----
 export const trialPredict = (payload) => api.post("/trial/predict", payload, { auth: false });
 

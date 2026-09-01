@@ -8,6 +8,7 @@ Riwayat migrasi saat ini (`backend/alembic/versions/`):
 1. `e1c752340178_baseline_schema...` — baseline: tabel `users`, `upload_sessions`, `customers` (skema yang sudah ada sebelum Alembic dipasang)
 2. `40275bdac8b5_add_password_reset_tokens_table` — tabel `password_reset_tokens` (fitur lupa password)
 3. `78e0e5687811_add_refresh_tokens_table` — tabel `refresh_tokens` (fitur refresh token, lihat docs/api.md bagian Autentikasi)
+4. `44af12fa09f8_add_is_admin_to_users` — kolom `users.is_admin` (fitur dashboard admin)
 
 ## Setup awal / server baru (database kosong)
 

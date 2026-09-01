@@ -30,6 +30,11 @@ export default function Navbar() {
           <NavLink to="/riwayat" className={({ isActive }) => (isActive ? "navbar-link active" : "navbar-link")}>
             Riwayat
           </NavLink>
+          {user?.is_admin && (
+            <NavLink to="/admin" className={({ isActive }) => (isActive ? "navbar-link active" : "navbar-link")}>
+              Admin
+            </NavLink>
+          )}
         </nav>
         <div className="navbar-user">
           <span className="navbar-business">{user?.business_name}</span>

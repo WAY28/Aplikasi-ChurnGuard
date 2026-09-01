@@ -1,0 +1,31 @@
+/* Tailwind di-scope KHUSUS halaman Admin (satu-satunya file yang meng-impor
+   CSS ini adalah pages/Admin.jsx). Sengaja cuma impor theme+utilities, BUKAN
+   "tailwindcss" penuh -- itu termasuk preflight.css (reset h1/p/button/dst)
+   yang akan ikut memengaruhi SEMUA halaman lain begitu Vite menggabungkan
+   CSS jadi satu bundle (App.jsx statically import semua page, tidak lazy-
+   loaded per rute). Tanpa preflight, utility class di sini murni "opt-in":
+   halaman lain yang tidak pernah menulis class Tailwind sama sekali otomatis
+   tidak terpengaruh apa pun. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* Token warna disamakan dengan brand yang sudah ada di styles/global.css,
+   supaya halaman Admin terasa satu keluarga dengan sisa aplikasi walau
+   dibangun dengan stack CSS yang berbeda. */
+@theme {
+  --color-admin-primary: #0f1e3d;
+  --color-admin-primary-dark: #081226;
+  --color-admin-highlight: #f5a623;
+  --color-admin-highlight-dark: #241a00;
+  --color-admin-danger: #f04438;
+  --color-admin-danger-bg: #fdebea;
+  --color-admin-success: #22c55e;
+  --color-admin-success-bg: #e7f9ee;
+  --color-admin-bg: #f5f7fa;
+  --color-admin-border: #e1e4ea;
+  --color-admin-text: #10182b;
+  --color-admin-text-secondary: #5b6470;
+
+  --font-admin-display: "Sora", "Segoe UI", system-ui, sans-serif;
+  --font-admin-body: "Inter", "Segoe UI", system-ui, sans-serif;
+}

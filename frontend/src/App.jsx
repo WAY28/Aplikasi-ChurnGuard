@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import CustomerDetail from "./pages/CustomerDetail";
 import UploadHistory from "./pages/UploadHistory";
 import Account from "./pages/Account";
+import Admin from "./pages/Admin";
 import TrialUpload from "./pages/TrialUpload";
 import TrialResults from "./pages/TrialResults";
 
@@ -37,6 +38,7 @@ export default function App() {
             <Route path="/customers/:id" element={<CustomerDetail />} />
             <Route path="/riwayat" element={<UploadHistory />} />
             <Route path="/account" element={<Account />} />
+            <Route path="/admin" element={<Admin />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
