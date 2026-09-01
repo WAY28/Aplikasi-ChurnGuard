@@ -39,7 +39,9 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  min-height: 44px;
   text-decoration: none;
+  touch-action: manipulation;
 }
 
 .landing-navbar-brand .logo {
@@ -54,11 +56,16 @@
 }
 
 .landing-navbar-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 4px 2px;
   color: rgba(255, 255, 255, 0.72);
   font-weight: 600;
   font-size: 0.92rem;
   text-decoration: none;
   transition: color 0.15s ease;
+  touch-action: manipulation;
 }
 
 .landing-navbar-links a:hover {
