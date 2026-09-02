@@ -19,10 +19,16 @@
   align-items: center;
   gap: var(--space-2);
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 0 var(--space-3);
   color: var(--color-text-secondary);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dashboard-search:focus-within {
+  border-color: var(--color-info);
+  box-shadow: 0 0 0 3px var(--color-info-bg);
 }
 
 .dashboard-search input {
@@ -38,7 +44,7 @@
 }
 
 .dashboard-filters select {
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 0 var(--space-3);
   min-height: 44px;
@@ -46,4 +52,16 @@
   font-family: inherit;
   background: var(--color-surface);
   color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dashboard-filters select:hover {
+  border-color: var(--color-info);
+}
+
+.dashboard-filters select:focus {
+  outline: none;
+  border-color: var(--color-info);
+  box-shadow: 0 0 0 3px var(--color-info-bg);
 }

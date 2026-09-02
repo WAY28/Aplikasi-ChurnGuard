@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Download } from "lucide-react";
+import { Download, UploadCloud } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Badge from "../components/Badge";
 import Dropzone from "../components/Dropzone";
@@ -76,9 +76,14 @@ export default function Upload() {
 
   return (
     <div className="stack">
-      <div>
-        <h1>Upload Data Pelanggan</h1>
-        <p>Unggah file CSV atau Excel berisi banyak pelanggan sekaligus. Atau, input satu pelanggan secara manual.</p>
+      <div className="page-header">
+        <span className="page-header-icon">
+          <UploadCloud size={22} />
+        </span>
+        <div>
+          <h1>Upload Data Pelanggan</h1>
+          <p>Unggah file CSV atau Excel berisi banyak pelanggan sekaligus. Atau, input satu pelanggan secara manual.</p>
+        </div>
       </div>
 
       <UploadModeTabs mode={mode} onChange={setMode} />

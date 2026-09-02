@@ -73,9 +73,14 @@ export default function UploadHistory() {
 
   return (
     <div className="stack">
-      <div>
-        <h1>Riwayat Upload</h1>
-        <p>Daftar sesi upload sebelumnya. Klik salah satu untuk lihat dashboard pada sesi tersebut.</p>
+      <div className="page-header">
+        <span className="page-header-icon">
+          <History size={22} />
+        </span>
+        <div>
+          <h1>Riwayat Upload</h1>
+          <p>Daftar sesi upload sebelumnya. Klik salah satu untuk lihat dashboard pada sesi tersebut.</p>
+        </div>
       </div>
 
       {fromCache && (

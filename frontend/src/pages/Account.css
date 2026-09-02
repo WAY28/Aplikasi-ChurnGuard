@@ -8,7 +8,7 @@
 .account-card-header {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   color: var(--color-primary);
   margin-bottom: var(--space-4);
 }
@@ -17,10 +17,32 @@
   margin: 0;
 }
 
+.account-card-header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-info-bg);
+  color: var(--color-info);
+}
+
 .account-danger-zone {
   border-color: var(--color-danger-bg);
+  transition: box-shadow 0.15s ease;
+}
+
+.account-danger-zone:hover {
+  box-shadow: 0 0 0 3px var(--color-danger-bg);
 }
 
 .account-danger-zone .account-card-header {
+  color: var(--color-danger);
+}
+
+.account-danger-zone .account-card-header-icon {
+  background: var(--color-danger-bg);
   color: var(--color-danger);
 }

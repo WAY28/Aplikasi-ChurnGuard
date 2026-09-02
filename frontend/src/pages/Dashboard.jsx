@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Download, Filter, PackageOpen, Search as SearchIcon } from "lucide-react";
+import { Download, Filter, LayoutDashboard, PackageOpen, Search as SearchIcon } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import MetricCard from "../components/MetricCard";
 import CustomerRow from "../components/CustomerRow";
@@ -103,9 +103,14 @@ export default function Dashboard() {
   return (
     <div className="stack">
       <div className="row-between">
-        <div>
-          <h1>Dashboard</h1>
-          <p>Ringkasan hasil analisis risiko churn pelanggan Anda.</p>
+        <div className="page-header">
+          <span className="page-header-icon">
+            <LayoutDashboard size={22} />
+          </span>
+          <div>
+            <h1>Dashboard</h1>
+            <p>Ringkasan hasil analisis risiko churn pelanggan Anda.</p>
+          </div>
         </div>
         <button
           type="button"

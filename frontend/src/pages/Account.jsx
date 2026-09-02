@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, KeyRound, Mail, Store, Trash2 } from "lucide-react";
+import { CheckCircle2, KeyRound, Mail, Settings, Store, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useAuth } from "../context/AuthContext";
@@ -57,7 +57,9 @@ function BusinessNameCard({ user, updateUser }) {
   return (
     <form onSubmit={handleSubmit} className="card">
       <div className="account-card-header">
-        <Store size={20} />
+        <span className="account-card-header-icon">
+          <Store size={18} />
+        </span>
         <h3>Nama Usaha</h3>
       </div>
       {error && <div className="error-banner">{error}</div>}
@@ -121,7 +123,9 @@ function EmailCard({ user, updateUser }) {
   return (
     <form onSubmit={handleSubmit} className="card">
       <div className="account-card-header">
-        <Mail size={20} />
+        <span className="account-card-header-icon">
+          <Mail size={18} />
+        </span>
         <h3>Email</h3>
       </div>
       {error && <div className="error-banner">{error}</div>}
@@ -196,7 +200,9 @@ function PasswordCard() {
   return (
     <form onSubmit={handleSubmit} className="card">
       <div className="account-card-header">
-        <KeyRound size={20} />
+        <span className="account-card-header-icon">
+          <KeyRound size={18} />
+        </span>
         <h3>Ubah Password</h3>
       </div>
       {error && <div className="error-banner">{error}</div>}
@@ -283,7 +289,9 @@ function DangerZoneCard() {
   return (
     <div className="card account-danger-zone">
       <div className="account-card-header">
-        <Trash2 size={20} />
+        <span className="account-card-header-icon">
+          <Trash2 size={18} />
+        </span>
         <h3>Hapus Akun</h3>
       </div>
       <p className="muted">
@@ -324,9 +332,14 @@ export default function Account() {
 
   return (
     <div className="stack">
-      <div>
-        <h1>Pengaturan Akun</h1>
-        <p>Kelola informasi dan keamanan akun Anda.</p>
+      <div className="page-header">
+        <span className="page-header-icon">
+          <Settings size={22} />
+        </span>
+        <div>
+          <h1>Pengaturan Akun</h1>
+          <p>Kelola informasi dan keamanan akun Anda.</p>
+        </div>
       </div>
 
       <div className="account-grid">

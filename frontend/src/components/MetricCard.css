@@ -6,6 +6,12 @@
   border-left: 4px solid var(--color-neutral);
   min-width: 0;
   box-shadow: var(--shadow-card);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .metric-card-value {

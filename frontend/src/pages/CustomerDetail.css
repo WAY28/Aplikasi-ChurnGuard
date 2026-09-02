@@ -4,11 +4,23 @@
   justify-content: space-between;
   gap: var(--space-4);
   flex-wrap: wrap;
+  border-left: 4px solid var(--color-border);
+}
+
+.customer-detail-header:has(.tone-danger) {
+  border-left-color: var(--color-danger);
+}
+
+.customer-detail-header:has(.tone-success) {
+  border-left-color: var(--color-success);
 }
 
 .customer-detail-score {
   text-align: center;
   flex-shrink: 0;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg);
 }
 
 .customer-detail-score-value {
