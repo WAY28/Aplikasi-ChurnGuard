@@ -9,11 +9,19 @@ menerjemahkan snake_case -> nama asli model, dan urutan kolom yang dikirim ke
 model.predict() SELALU diambil dari model.feature_names_in_ langsung -- bukan
 di-hardcode -- supaya urutan kolom tidak pernah salah walau model diganti.
 
-Kolom kategorikal di-encode dengan mapping berikut, hasil label-encoding
-alfabetis (perilaku default sklearn.preprocessing.LabelEncoder) atas dataset
-"E Commerce Dataset.xlsx" yang jadi sumber training model ini -- sudah
-divalidasi: prediksi dengan mapping ini mencapai akurasi 98,05% saat
-dicocokkan ke kolom Churn asli di seluruh 5630 baris dataset training.
+Kolom kategorikal di-encode lewat `label_encoders.pkl` -- dict of fitted
+sklearn.preprocessing.LabelEncoder per kolom, di-fit HANYA pada data latih saat
+training (lihat notebook eksperimen). Di sini cuma dipanggil `.transform()`,
+TIDAK PERNAH fit ulang, supaya konsisten dengan metodologi train/test split
+yang dipakai untuk melatih model (menghindari data leakage) -- kategori yang
+tidak pernah dilihat encoder saat fit akan ditolak dengan pesan error yang
+jelas, bukan ditebak diam-diam.
+
+Kolom numerik yang di dataset training punya nilai kosong (NaN) diisi dengan
+median dari data latih, disimpan di `imputation_medians.pkl`. Kolom yang tidak
+ada di file ini (termasuk semua kolom kategorikal & integer yang di dataset
+asli tidak pernah kosong) tetap WAJIB diisi -- baris dengan kolom itu kosong
+akan ditolak (ValueError), bukan diimputasi.
 """
 
 import logging
@@ -26,29 +34,8 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 MODEL_PATH = Path(__file__).parent / "model_churn.pkl"
-
-CATEGORY_MAPS: dict[str, dict[str, int]] = {
-    "PreferredLoginDevice": {"Computer": 0, "Mobile Phone": 1, "Phone": 2},
-    "PreferredPaymentMode": {
-        "CC": 0,
-        "COD": 1,
-        "Cash on Delivery": 2,
-        "Credit Card": 3,
-        "Debit Card": 4,
-        "E wallet": 5,
-        "UPI": 6,
-    },
-    "Gender": {"Female": 0, "Male": 1},
-    "PreferedOrderCat": {
-        "Fashion": 0,
-        "Grocery": 1,
-        "Laptop & Accessory": 2,
-        "Mobile": 3,
-        "Mobile Phone": 4,
-        "Others": 5,
-    },
-    "MaritalStatus": {"Divorced": 0, "Married": 1, "Single": 2},
-}
+LABEL_ENCODERS_PATH = Path(__file__).parent / "label_encoders.pkl"
+IMPUTATION_MEDIANS_PATH = Path(__file__).parent / "imputation_medians.pkl"
 
 # model feature name (CamelCase) -> kolom snake_case di tabel customers / schemas
 FEATURE_FIELD_MAP: dict[str, str] = {
@@ -80,14 +67,24 @@ class ModelNotLoadedError(RuntimeError):
 class ChurnModel:
     def __init__(self) -> None:
         self._model = None
+        self._label_encoders: dict[str, Any] = {}
+        self._imputation_medians: dict[str, float] = {}
 
     def load(self) -> None:
         try:
             self._model = joblib.load(MODEL_PATH)
+            self._label_encoders = joblib.load(LABEL_ENCODERS_PATH)
+            self._imputation_medians = joblib.load(IMPUTATION_MEDIANS_PATH)
         except Exception:
-            logger.exception("Gagal memuat model churn dari %s", MODEL_PATH)
+            logger.exception("Gagal memuat model/preprocessing churn dari %s", MODEL_PATH.parent)
             raise
-        logger.info("Model churn dimuat dari %s (%d fitur)", MODEL_PATH, len(self._model.feature_names_in_))
+        logger.info(
+            "Model churn dimuat dari %s (%d fitur, %d encoder kategorikal, %d kolom imputasi)",
+            MODEL_PATH,
+            len(self._model.feature_names_in_),
+            len(self._label_encoders),
+            len(self._imputation_medians),
+        )
 
     @property
     def model(self):
@@ -100,17 +97,22 @@ class ChurnModel:
         prefix = f"Baris {row_label}: " if row_label else ""
         for model_feature, field_name in FEATURE_FIELD_MAP.items():
             value = data.get(field_name)
+
             if value is None:
+                if model_feature in self._imputation_medians:
+                    row[model_feature] = self._imputation_medians[model_feature]
+                    continue
                 raise ValueError(f"{prefix}kolom '{field_name}' kosong/tidak ada")
 
-            mapping = CATEGORY_MAPS.get(model_feature)
-            if mapping is not None:
-                if value not in mapping:
-                    allowed = ", ".join(mapping.keys())
+            encoder = self._label_encoders.get(model_feature)
+            if encoder is not None:
+                try:
+                    row[model_feature] = int(encoder.transform([value])[0])
+                except ValueError:
+                    allowed = ", ".join(encoder.classes_)
                     raise ValueError(
                         f"{prefix}nilai '{value}' tidak valid untuk '{field_name}'. Pilihan yang diterima: {allowed}"
-                    )
-                row[model_feature] = mapping[value]
+                    ) from None
             else:
                 row[model_feature] = value
         return row

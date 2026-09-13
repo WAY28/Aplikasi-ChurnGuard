@@ -59,10 +59,24 @@ def test_predict_batch_matches_predict_one(model):
 
 
 def test_predict_one_missing_field_raises_value_error(model):
+    # satisfaction_score bukan salah satu kolom yang diimputasi (lihat
+    # imputation_medians.pkl) -- di dataset asli kolom ini tidak pernah
+    # kosong, jadi tetap wajib diisi kalau hilang.
+    incomplete = dict(SAFE_PROFILE)
+    del incomplete["satisfaction_score"]
+    with pytest.raises(ValueError, match="satisfaction_score"):
+        model.predict_one(incomplete)
+
+
+def test_predict_one_missing_imputable_field_uses_median(model):
+    # tenure ADA di imputation_medians.pkl (kolom yang di dataset training
+    # asli memang punya nilai kosong) -- kalau hilang, harusnya diisi median
+    # dari data latih, bukan ditolak dengan error.
     incomplete = dict(SAFE_PROFILE)
     del incomplete["tenure"]
-    with pytest.raises(ValueError, match="tenure"):
-        model.predict_one(incomplete)
+    prediction, probability = model.predict_one(incomplete)
+    assert prediction in (0, 1)
+    assert 0.0 <= probability <= 1.0
 
 
 def test_predict_one_invalid_category_raises_value_error(model):
