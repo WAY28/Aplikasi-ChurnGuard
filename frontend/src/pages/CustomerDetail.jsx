@@ -146,7 +146,10 @@ export default function CustomerDetail() {
           )}
         </div>
         <div className="customer-detail-score">
-          <div className={`customer-detail-score-value tone-${riskTone(customer.churn_prediction)}`}>
+          <div
+            className={`customer-detail-score-value tone-${riskTone(customer.churn_prediction)}`}
+            data-testid="risk-score"
+          >
             {formatPercent(customer.churn_probability)}
           </div>
           <div className="muted">skor risiko churn</div>

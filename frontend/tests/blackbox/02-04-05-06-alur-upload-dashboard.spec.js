@@ -9,6 +9,32 @@ const VALID_CSV_BATCH2 = path.join(__dirname, "fixtures", "valid_customers_batch
 const VALID_CSV_ROWS = 7;
 const VALID_CSV_BATCH2_ROWS = 2;
 
+// 18 atribut valid yang boleh muncul di "Faktor Utama Penyebab" -- versi label
+// yang terlihat pengguna dari 18 fitur model (FEATURE_FIELD_MAP di
+// backend/ml/predictor.py). Sengaja ditulis ulang di sini, BUKAN di-import
+// dari frontend/src/utils/format.js, supaya test tidak sekadar mencocokkan
+// kode aplikasi dengan dirinya sendiri.
+const VALID_FEATURE_LABELS = [
+  "Lama Berlangganan",
+  "Perangkat Login",
+  "Tingkat Kota",
+  "Jarak Gudang ke Rumah",
+  "Metode Pembayaran",
+  "Gender",
+  "Jam Pemakaian Aplikasi",
+  "Jumlah Perangkat Terdaftar",
+  "Kategori Favorit",
+  "Skor Kepuasan",
+  "Status Pernikahan",
+  "Jumlah Alamat",
+  "Riwayat Komplain",
+  "Kenaikan Jumlah Order",
+  "Kupon Dipakai",
+  "Jumlah Order",
+  "Hari Sejak Order Terakhir",
+  "Cashback",
+];
+
 // Skenario 2, 4, 5, 6 digabung jadi satu alur berurutan (test.describe.serial)
 // karena secara alami mengikuti perjalanan pengguna sungguhan: upload -> lihat
 // dashboard -> buka detail salah satu pelanggan -> upload lagi -> cek riwayat.
@@ -55,21 +81,62 @@ test.describe.serial("alur upload -> dashboard -> detail -> riwayat", () => {
 
   test("Skenario 5: detail pelanggan menampilkan kelas prediksi dan faktor penyebab", async () => {
     await page.goto("/dashboard");
-    await page.locator(".customer-row").first().click();
+    // Baris pelanggan = tautan yang nama aksesibelnya memuat "skor risiko".
+    await page.getByRole("link", { name: /skor risiko/ }).first().click();
 
     await expect(page).toHaveURL(/\/customers\/\d+$/);
 
-    // Kelas prediksi (badge Aman/Risiko Tinggi) + skor persen harus tampil.
-    const badge = page.locator(".badge").first();
-    await expect(badge).toBeVisible();
-    await expect(page.locator(".customer-detail-score-value")).toBeVisible();
-    const scoreText = await page.locator(".customer-detail-score-value").textContent();
-    expect(scoreText.trim()).toMatch(/^\d+%$/);
+    // Skor risiko tampil sebagai persen. (Satu-satunya elemen yang dicari lewat
+    // data-testid: nilainya tidak punya role maupun teks unik -- "65%" mirip
+    // dengan nilai faktor seperti "0%".)
+    const score = page.getByTestId("risk-score");
+    await expect(score).toBeVisible();
+    const scoreText = (await score.textContent()).trim();
+    expect(scoreText).toMatch(/^\d+%$/);
+    const scorePercent = parseInt(scoreText, 10);
 
-    // Minimal satu faktor penyebab (feature importance) tampil dengan nama + nilai.
-    await expect(page.getByText("Faktor Utama Penyebab")).toBeVisible();
-    const factorRows = page.locator(".feature-bar-item");
-    expect(await factorRows.count()).toBeGreaterThan(0);
+    // Badge KELAS PREDIKSI dicari lewat teksnya yang persis ("Risiko Tinggi" atau
+    // "Aman"), jadi badge status kontak ("Belum Dihubungi", dst.) di halaman yang
+    // sama tidak mungkin ikut terambil. toHaveCount(1) memastikan memang hanya
+    // ada satu.
+    const classBadge = page.getByText(/^(Risiko Tinggi|Aman)$/);
+    await expect(classBadge).toHaveCount(1);
+    const classLabel = (await classBadge.textContent()).trim();
+
+    // Badge harus cocok dengan skor. Skor ditampilkan dibulatkan, jadi tepat di
+    // 50% tidak bisa ditentukan kelasnya dari angka yang terlihat (mis. 49,6%
+    // tampil "50%" tapi kelasnya Aman) -- pada kasus itu keduanya diterima.
+    if (scorePercent > 50) {
+      expect(classLabel).toBe("Risiko Tinggi");
+    } else if (scorePercent < 50) {
+      expect(classLabel).toBe("Aman");
+    } else {
+      expect(["Risiko Tinggi", "Aman"]).toContain(classLabel);
+    }
+
+    // Faktor penyebab: judul bagian + daftar faktor.
+    await expect(page.getByRole("heading", { name: "Faktor Utama Penyebab" })).toBeVisible();
+    const factorItems = page
+      .getByRole("list", { name: "Faktor utama penyebab churn" })
+      .getByRole("listitem");
+    await expect(factorItems.first()).toBeVisible();
+    const factorTexts = (await factorItems.allTextContents()).map((t) => t.trim());
+    expect(factorTexts.length).toBeGreaterThan(0);
+    expect(factorTexts.length).toBeLessThanOrEqual(VALID_FEATURE_LABELS.length);
+
+    // Tiap baris berbentuk "<nama atribut><+/-nilai>%"; nama harus salah satu
+    // dari 18 atribut valid, dan tidak boleh ada atribut yang muncul dua kali.
+    const factorNames = factorTexts.map((text) => {
+      const parsed = text.match(/^(.+?)([+-]?\d+%)$/);
+      expect(parsed, `baris faktor tidak berbentuk "<nama><nilai>%": "${text}"`).not.toBeNull();
+      expect(VALID_FEATURE_LABELS, `atribut "${parsed[1]}" bukan salah satu dari 18 atribut valid`).toContain(parsed[1]);
+      return parsed[1];
+    });
+    expect(new Set(factorNames).size).toBe(factorNames.length);
+
+    // Tunggu animasi bar selesai (transisi 0,7s + jeda bertahap) supaya
+    // screenshot menunjukkan bar terisi penuh, bukan di tengah animasi.
+    await page.waitForTimeout(1500);
 
     await page.screenshot({ path: "tests/blackbox/screenshots/05-detail-pelanggan.png", fullPage: true });
   });

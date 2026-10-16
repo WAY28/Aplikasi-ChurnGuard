@@ -21,12 +21,12 @@ export default function FeatureImportanceBars({ factors }) {
   const maxMagnitude = Math.max(...factors.map((f) => Math.abs(f.contribution)));
 
   return (
-    <div className="feature-bars">
+    <div className="feature-bars" role="list" aria-label="Faktor utama penyebab churn">
       {factors.map((f, i) => {
         const increasesRisk = f.direction === "increases_risk";
         const percentPoints = Math.round(f.contribution * 100);
         return (
-          <div className="feature-bar-item" key={f.feature}>
+          <div className="feature-bar-item" role="listitem" key={f.feature}>
             <div className="feature-bar-label">
               <span>{featureLabel(f.feature)}</span>
               <span className={`feature-bar-value tone-${increasesRisk ? "danger" : "info"}`}>
