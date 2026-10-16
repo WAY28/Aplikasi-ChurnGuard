@@ -41,6 +41,9 @@ test("login dengan password salah ditolak dan tidak membentuk sesi", async ({ pa
   await registerAccount(page, { businessName: "Toko Skenario Satu C", email, password: "PasswordUji123" });
   await page.getByRole("button", { name: /Toko Skenario Satu C/ }).click();
   await page.getByRole("menuitem", { name: "Keluar" }).click();
+  // WAJIB tunggu logout benar-benar selesai sebelum navigasi lagi, kalau tidak
+  // request logout yang masih berjalan terputus dan sesi tetap hidup.
+  await expect(page).toHaveURL(/\/login$/);
 
   await loginAccount(page, { email, password: "PasswordSalahBanget999" });
 
