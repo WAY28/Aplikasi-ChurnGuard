@@ -12,7 +12,9 @@ export default defineConfig({
   reporter: [["list"], ["html", { outputFolder: "tests/blackbox/report", open: "never" }]],
   timeout: 30_000,
   use: {
-    baseURL: "http://localhost:5173",
+    // Default: dev server lokal. Untuk menguji situs yang sudah di-deploy,
+    // set BASE_URL (mis. $env:BASE_URL="https://aplikasi-churn-guard.vercel.app").
+    baseURL: process.env.BASE_URL || "http://localhost:5173",
     screenshot: "on",
     trace: "retain-on-failure",
   },
