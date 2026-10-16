@@ -30,3 +30,7 @@ audit-screenshots/
 # Original attachment; the copy actually used by the app lives in backend/ml/
 /model_churn.pkl
 
+
+# Playwright transient output (regenerated on every run)
+frontend/test-results/
+frontend/tests/blackbox/report/

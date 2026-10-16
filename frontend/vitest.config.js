@@ -13,5 +13,8 @@ export default defineConfig({
     // tidak spawn proses OS baru) terbukti stabil di semua environment yang
     // sudah dicoba.
     pool: "threads",
+    // tests/blackbox/ adalah spec Playwright (dijalankan lewat `npx playwright test`),
+    // bukan test Vitest -- tanpa exclude ini Vitest ikut memuatnya dan gagal.
+    exclude: ["**/node_modules/**", "tests/blackbox/**"],
   },
 });
