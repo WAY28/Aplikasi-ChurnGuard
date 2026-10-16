@@ -16,13 +16,17 @@ router = APIRouter(prefix="/api/trial", tags=["trial"])
 
 @router.post("/predict", response_model=schemas.TrialPredictResponse)
 def trial_predict(payload: schemas.CustomerFeatures):
+    payload_dict = payload.model_dump()
     with handle_prediction_errors():
-        prediction, probability = churn_model.predict_one(payload.model_dump())
+        prediction, probability = churn_model.predict_one(payload_dict)
+        # Penjelasan lokal (SHAP), personal untuk input ini -- bukan
+        # feature_importances_ global yang sama untuk semua pengguna trial.
+        local_factors = churn_model.local_factors(payload_dict)
 
     return schemas.TrialPredictResponse(
         churn_prediction=prediction,
         churn_probability=probability,
-        top_factors=churn_model.top_factors(),
+        local_factors=local_factors,
     )
 
 

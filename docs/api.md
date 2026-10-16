@@ -156,15 +156,16 @@ Hapus satu pelanggan.
 **Response 404:** sama seperti endpoint detail (tidak ditemukan/bukan milik akun ini)
 
 ### GET `/customers/{id}`
-Detail satu pelanggan, termasuk feature importance yang relevan.
+Detail satu pelanggan, termasuk penjelasan lokal (SHAP) untuk pelanggan ini secara spesifik.
 **Response 200:**
 ```json
 {
   "id": 12, "churn_prediction": 1, "churn_probability": 0.82,
-  "top_factors": [{"feature": "Tenure", "importance": 0.22}],
+  "local_factors": [{"feature": "Tenure", "contribution": 0.2034, "direction": "increases_risk"}],
   "phone": "6281234567890", "email": "pelanggan@email.com"
 }
 ```
+`local_factors` dihitung lewat `shap.TreeExplainer` (lihat `ml/predictor.py`, method `local_factors()`) -- **berbeda per pelanggan**, bukan `feature_importances_` global Random Forest yang sama untuk semua orang (metode itu masih ada sebagai `ChurnModel.top_factors()`, tapi tidak lagi dipakai endpoint manapun yang menghadap pengguna). `contribution` positif mendorong ke arah churn, negatif menariknya ke arah tidak churn; `direction` adalah `"increases_risk"` atau `"decreases_risk"`.
 **Response 404:** kalau pelanggan tidak ditemukan ATAU bukan milik akun yang login (jangan bedakan pesan error, demi keamanan)
 
 ### PATCH `/customers/{id}/contact`
@@ -245,8 +246,9 @@ Coba prediksi satu pelanggan tanpa akun.
 **Request body:** sama seperti `POST /customers` (seluruh fitur, lihat `database.md`)
 **Response 200:**
 ```json
-{ "churn_prediction": 1, "churn_probability": 0.82, "top_factors": [{"feature": "Tenure", "importance": 0.22}] }
+{ "churn_prediction": 1, "churn_probability": 0.82, "local_factors": [{"feature": "Tenure", "contribution": 0.2034, "direction": "increases_risk"}] }
 ```
+Lihat catatan `local_factors` di `GET /customers/{id}` di atas -- sama persis di sini.
 
 ### POST `/trial/upload` (publik)
 Coba prediksi banyak pelanggan sekaligus dari CSV/Excel, tanpa akun.

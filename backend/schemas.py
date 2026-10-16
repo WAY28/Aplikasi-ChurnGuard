@@ -106,8 +106,25 @@ class CustomerCreateResponse(BaseModel):
 
 
 class TopFactor(BaseModel):
+    """Peringkat atribut global (feature_importances_ Random Forest) -- sama
+    untuk semua pelanggan. Dipertahankan sebagai utilitas internal/diagnostik;
+    endpoint yang menghadap pengguna memakai LocalFactor (lihat di bawah).
+    """
+
     feature: str
     importance: float
+
+
+class LocalFactor(BaseModel):
+    """Kontribusi SHAP untuk SATU pelanggan (penjelasan lokal) -- berbeda-beda
+    antarpelanggan, tidak seperti TopFactor yang global. `contribution` positif
+    berarti atribut itu MENDORONG prediksi ke arah churn, negatif berarti
+    menariknya ke arah tidak churn.
+    """
+
+    feature: str
+    contribution: float
+    direction: Literal["increases_risk", "decreases_risk"]
 
 
 class CustomerOut(BaseModel):
@@ -146,7 +163,7 @@ class CustomerOut(BaseModel):
 
 
 class CustomerDetailOut(CustomerOut):
-    top_factors: list[TopFactor]
+    local_factors: list[LocalFactor]
 
 
 class ContactStatusUpdate(BaseModel):
@@ -256,7 +273,7 @@ class AdminResetPasswordRequest(BaseModel):
 class TrialPredictResponse(BaseModel):
     churn_prediction: int
     churn_probability: float
-    top_factors: list[TopFactor]
+    local_factors: list[LocalFactor]
 
 
 class TrialUploadResultItem(BaseModel):

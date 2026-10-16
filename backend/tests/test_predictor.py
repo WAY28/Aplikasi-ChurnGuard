@@ -105,3 +105,44 @@ def test_top_factors_shape_and_order(model):
 def test_top_factors_respects_n(model):
     assert len(model.top_factors(n=3)) == 3
     assert len(model.top_factors(n=10)) == 10
+
+
+def test_local_factors_shape_and_order(model):
+    factors = model.local_factors(RISKY_PROFILE, n=5)
+    assert len(factors) == 5
+    for item in factors:
+        assert set(item.keys()) == {"feature", "contribution", "direction"}
+        assert item["direction"] in ("increases_risk", "decreases_risk")
+        assert (item["contribution"] >= 0) == (item["direction"] == "increases_risk")
+    # Terurut berdasarkan besaran kontribusi (|SHAP value|), bukan nilai mentah.
+    magnitudes = [abs(f["contribution"]) for f in factors]
+    assert magnitudes == sorted(magnitudes, reverse=True)
+
+
+def test_local_factors_respects_n(model):
+    assert len(model.local_factors(SAFE_PROFILE, n=3)) == 3
+    assert len(model.local_factors(SAFE_PROFILE, n=10)) == 10
+
+
+def test_local_factors_are_personal_not_global(model):
+    """Inti klaim yang direvisi di artikel: top-1 atribut penyebab churn
+    BERBEDA antarpelanggan (SHAP/lokal), bukan ranking yang sama untuk semua
+    orang seperti top_factors() (global, feature_importances_)."""
+    safe_factors = model.local_factors(SAFE_PROFILE, n=1)
+    risky_factors = model.local_factors(RISKY_PROFILE, n=1)
+
+    # top_factors() SELALU sama, berapa pun profil yang dicek -- ini justru
+    # yang diprotes reviewer kalau dipakai sebagai "penjelasan per pelanggan".
+    assert model.top_factors(n=1) == model.top_factors(n=1)
+
+    # local_factors() boleh saja top-1-nya kebetulan sama untuk dua profil
+    # tertentu, tapi nilai kontribusinya (bukan cuma urutan) harus berbeda,
+    # membuktikan nilainya dihitung ulang per baris data, bukan di-cache global.
+    assert safe_factors[0]["contribution"] != risky_factors[0]["contribution"]
+
+
+def test_local_factors_invalid_category_raises_value_error(model):
+    invalid = dict(SAFE_PROFILE)
+    invalid["gender"] = "Tidak Diketahui"
+    with pytest.raises(ValueError, match="gender"):
+        model.local_factors(invalid)

@@ -154,7 +154,10 @@ export default function TrialUpload() {
 
               <div>
                 <h4>Faktor Utama Penyebab</h4>
-                <FeatureImportanceBars factors={manualResult.top_factors} />
+                <p className="muted" style={{ marginTop: "calc(-1 * var(--space-2))", marginBottom: "var(--space-3)" }}>
+                  Dihitung khusus untuk data ini (SHAP) — atributnya bisa berbeda untuk tiap pelanggan.
+                </p>
+                <FeatureImportanceBars factors={manualResult.local_factors} />
               </div>
 
               <div className="row" style={{ justifyContent: "center" }}>

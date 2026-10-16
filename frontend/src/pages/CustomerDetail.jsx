@@ -155,7 +155,10 @@ export default function CustomerDetail() {
 
       <div className="card">
         <h3>Faktor Utama Penyebab</h3>
-        <FeatureImportanceBars factors={customer.top_factors} />
+        <p className="muted" style={{ marginTop: "calc(-1 * var(--space-2))", marginBottom: "var(--space-3)" }}>
+          Dihitung khusus untuk pelanggan ini (SHAP) — atributnya bisa berbeda untuk tiap pelanggan.
+        </p>
+        <FeatureImportanceBars factors={customer.local_factors} />
       </div>
 
       <div className="card">

@@ -230,9 +230,11 @@ def get_customer(
 ):
     customer = get_customer_or_404(db, customer_id, current_user.id)
 
-    top_factors = churn_model.top_factors()
     detail = schemas.CustomerOut.model_validate(customer).model_dump()
-    return schemas.CustomerDetailOut(**detail, top_factors=top_factors)
+    # Penjelasan lokal (SHAP), personal untuk pelanggan ini -- bukan
+    # feature_importances_ global yang sama untuk semua pelanggan.
+    local_factors = churn_model.local_factors(detail)
+    return schemas.CustomerDetailOut(**detail, local_factors=local_factors)
 
 
 @router.patch("/{customer_id}/contact", response_model=schemas.ContactStatusResponse)
