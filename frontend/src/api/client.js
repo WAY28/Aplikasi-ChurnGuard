@@ -103,3 +103,18 @@ export const api = {
   del: (path, body, opts) => request(path, { ...opts, method: "DELETE", body }),
   postForm: (path, formData, opts) => request(path, { ...opts, method: "POST", body: formData, isForm: true }),
 };
+
+// Unduh file biner (mis. template .xlsx) dari endpoint publik, hasilnya Blob.
+// Tanpa auto-refresh 401 karena endpoint seperti ini tidak butuh login.
+export async function downloadFile(path) {
+  let response;
+  try {
+    response = await rawFetch(path, { method: "GET" });
+  } catch {
+    throw new ApiError("Tidak bisa terhubung ke server. Periksa koneksi internet Anda.", 0, null);
+  }
+  if (!response.ok) {
+    throw new ApiError(`Gagal mengunduh file (${response.status}). Coba lagi dalam beberapa saat.`, response.status, null);
+  }
+  return response.blob();
+}

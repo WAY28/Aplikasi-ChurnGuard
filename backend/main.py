@@ -25,6 +25,7 @@ from routers import account as account_router  # noqa: E402
 from routers import admin as admin_router  # noqa: E402
 from routers import auth as auth_router  # noqa: E402
 from routers import customers as customers_router  # noqa: E402
+from routers import template as template_router  # noqa: E402
 from routers import trial as trial_router  # noqa: E402
 from routers import upload_sessions as upload_sessions_router  # noqa: E402
 
@@ -111,6 +112,7 @@ app.include_router(auth_router.router)
 app.include_router(customers_router.router)
 app.include_router(upload_sessions_router.router)
 app.include_router(trial_router.router)
+app.include_router(template_router.router)
 app.include_router(account_router.router)
 app.include_router(admin_router.router)
 

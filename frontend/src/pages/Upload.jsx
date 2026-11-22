@@ -7,7 +7,7 @@ import UploadModeTabs from "../components/UploadModeTabs";
 import CustomerFeatureForm from "../components/CustomerFeatureForm";
 import { createCustomer, uploadCustomers } from "../api/endpoints";
 import { ApiError } from "../api/client";
-import { downloadTemplateCsv } from "../utils/csvTemplate";
+import { downloadTemplateXlsx } from "../utils/templateDownload";
 import { buildCustomerPayload, emptyManualForm } from "../utils/customerFields";
 import { formatPercent, riskLabel, riskTone } from "../utils/format";
 import { useOnlineStatus } from "../utils/useOnlineStatus";
@@ -41,6 +41,14 @@ export default function Upload() {
       setUploadError(err.message || "File gagal diproses. Pastikan kolomnya sesuai template, lalu coba lagi.");
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleDownloadTemplate() {
+    try {
+      await downloadTemplateXlsx();
+    } catch (err) {
+      setUploadError(err.message || "Template gagal diunduh. Coba lagi dalam beberapa saat.");
     }
   }
 
@@ -90,13 +98,17 @@ export default function Upload() {
 
       {mode === "file" && (
         <div className="card stack">
-          {uploadError && <div className="error-banner">{uploadError}</div>}
+          {uploadError && (
+            <div className="error-banner" style={{ whiteSpace: "pre-line" }}>
+              {uploadError}
+            </div>
+          )}
 
           <Dropzone selectedFile={selectedFile} onFileSelected={setSelectedFile} onError={setUploadError} />
 
-          <button type="button" className="link-button" onClick={downloadTemplateCsv}>
+          <button type="button" className="link-button" onClick={handleDownloadTemplate}>
             <Download size={16} />
-            <span>Unduh template contoh (.csv)</span>
+            <span>Unduh template contoh (.xlsx)</span>
           </button>
 
           <button

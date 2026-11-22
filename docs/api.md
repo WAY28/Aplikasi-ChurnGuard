@@ -126,6 +126,20 @@ Upload file CSV/Excel berisi banyak pelanggan sekaligus.
 ```json
 { "upload_session_id": 5, "total_customers": 120, "high_risk_count": 23 }
 ```
+**Format file** (berlaku juga untuk `POST /trial/upload`):
+- `.xlsx` (sheet `Template` kalau ada, kalau tidak sheet pertama) atau `.csv`, maksimal 5 MB.
+- CSV: pemisah koma, titik koma, atau tab dideteksi otomatis. BOM UTF-8 dan baris `sep=,` diabaikan. Angka boleh memakai koma desimal (`12,5`).
+- Nama kolom dicocokkan tanpa peduli huruf besar/kecil, spasi, dan underscore. Kolom tambahan diabaikan. Baris kosong diabaikan.
+- Nilai kategori dicocokkan tanpa peduli huruf besar/kecil. `Phone` dan `Mobile` dibaca `Mobile Phone`, `CC` dibaca `Credit Card`, `Cash on Delivery` dibaca `COD` (lihat `CATEGORY_ALIASES` di `backend/constants.py`).
+- Kolom desimal (`tenure`, `warehouse_to_home`, `hour_spend_on_app`, `order_amount_hike`, `coupon_used`, `order_count`, `day_since_last_order`, `cashback_amount`) boleh kosong dan diisi median data latih. Kolom bulat dan kategorikal wajib terisi.
+- **Response 400** kalau ada kolom hilang (`Kolom wajib tidak ditemukan di file: ...`) atau ada baris bermasalah. Semua baris bermasalah dilaporkan sekaligus (maks. 10 ditampilkan), bernomor seperti di Excel (header = baris 1), dan tidak ada yang disimpan:
+```json
+{ "detail": "Ada 2 baris yang perlu diperbaiki:\nBaris 3: kolom 'tenure' harus berupa angka (isinya 'abc')\nBaris 4: kolom 'gender' nilai 'Alien' tidak valid. Pilihan: Female, Male" }
+```
+
+### GET `/template` (publik)
+Unduh template upload `.xlsx` (`template-churnguard.xlsx`), dibuat di backend (`backend/template_utils.py`).
+Sheet `Template`: 21 kolom, satu baris contoh, kolom `phone` berformat teks, dropdown untuk kolom kategori, batas nilai untuk kolom angka, header dibekukan. Sheet `Panduan Pengisian`: arti, satuan atau pilihan, dan contoh tiap kolom.
 
 ### GET `/customers`
 Ambil pelanggan milik akun yang login, dengan pagination, pencarian, dan filter.
